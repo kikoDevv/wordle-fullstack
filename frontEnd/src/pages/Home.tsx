@@ -10,7 +10,9 @@ export default function Home() {
 	//--------State to store all submitted entries------
 	const [submissions, setSubmissions] = useState<string[][]>([]);
 
-	const [correctWordsCollection, setCorrectWordsCollection] = useState<any[]>([]);
+	const [correctWordsCollection, setCorrectWordsCollection] = useState<any[]>(
+		[]
+	);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTypedValue(e.target.value);
@@ -35,8 +37,7 @@ export default function Home() {
 			setTypedValue("");
 
 			// save all of the corrected words with the feedback
-			setCorrectWordsCollection([...correctWordsCollection, correctWordIs])
-
+			setCorrectWordsCollection([...correctWordsCollection, correctWordIs]);
 		}
 	};
 	// console.log("correct words collection-->", correctWordsCollection);
@@ -52,14 +53,20 @@ export default function Home() {
 			<div>
 				{submissions.length > 0 && (
 					<div className="grid bg-neutral-700 rounded-2xl mb-1 py-1 flex-wrap">
-						{submissions.map((submission, subIndex) => (
+						{correctWordsCollection.map((wordFeedback, subIndex) => (
 							<div key={subIndex} className="flex justify-center mb-1">
-								{submission.map((char, charIndex) => (
+								{wordFeedback.map((charInfo, charIndex) => (
 									<h1
 										key={`sub-${subIndex}-char-${charIndex}`}
-										className="font-extrabold px-4 py-2 mx-0.5 bg-amber-300 rounded-xl"
+										className={`font-extrabold px-4 py-2 mx-0.5 rounded-xl ${
+											charInfo.result === "correct"
+												? "bg-green-500"
+												: charInfo.result === "misplaced"
+												? "bg-amber-300"
+												: "bg-red-400"
+										}`}
 									>
-										{char}
+										{charInfo.letter}
 									</h1>
 								))}
 							</div>
