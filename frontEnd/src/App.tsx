@@ -1,9 +1,10 @@
 import Header from "./components/Header";
 import Home from "./pages/Home";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import About from "./pages/About";
 import Score from "./pages/Score";
 import PageNotFound from "./components/PageNotFound";
+
 
 function App() {
 	return (

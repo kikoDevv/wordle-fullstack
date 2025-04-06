@@ -1,5 +1,6 @@
 import Button from "../components/Button";
 import React, { useState, useEffect } from "react";
+import { GetFeedback } from "../services/api/targetWord.js";
 
 export default function Home() {
 	//-------State for the current input value------
@@ -9,6 +10,8 @@ export default function Home() {
 	//--------State to store all submitted entries------
 	const [submissions, setSubmissions] = useState<string[][]>([]);
 
+	const [correctWordsCollection, setCorrectWordsCollection] = useState<any[]>([]);
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTypedValue(e.target.value);
 	};
@@ -17,15 +20,26 @@ export default function Home() {
 		const characters = typedValue.split("").filter((char) => char !== " ");
 		setWords(characters);
 	}, [typedValue]);
-
-	//-------Handle submit button click-----
+	//-------onSubmit do this-------
 	const handleSubmit = () => {
 		if (words.length > 0) {
-			//-----Add current words to submissions------
-			setSubmissions([...submissions, [...words]]);
+			const targetWord = "hellow";
+
+			const newSubmission = [...words];
+
+			const correctWordIs = GetFeedback(newSubmission.join(""), targetWord);
+			console.log("correctWordIs--->:", correctWordIs);
+
+			// Update submissions state
+			setSubmissions([...submissions, newSubmission]);
 			setTypedValue("");
+
+			// save all of the corrected words with the feedback
+			setCorrectWordsCollection([...correctWordsCollection, correctWordIs])
+
 		}
 	};
+	// console.log("correct words collection-->", correctWordsCollection);
 	//----key press for enter or return-------
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter") {
