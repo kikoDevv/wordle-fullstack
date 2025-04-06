@@ -1,6 +1,10 @@
-import Button from "../components/Button";
+import Button from "../components/btns/Button.js";
 import React, { useState, useEffect } from "react";
 import { GetFeedback } from "../services/api/targetWord.js";
+import SlideSelector from "../components/btns/SlideSelector.js";
+
+import RepeatLetterToggle from "../components/btns/RepeatToggle.js";
+import CheatModeToggle from "../components/btns/CheatToggle.js";
 
 export default function Home() {
 	//-------State for the current input value------
@@ -95,11 +99,27 @@ export default function Home() {
 							onKeyDown={handleKeyPress}
 						/>
 					</div>
+					{/* //-------------buttons------------------ */}
 					<div className="flex px-2 py-2">
-						<Button text="Repeat words" />
-						<Button text="Words lenght" />
+						<RepeatLetterToggle
+							onChange={(allowed) => {
+								console.log("Repeat letters allowed:", allowed);
+							}}
+						/>
+
+						<CheatModeToggle
+							onChange={(enabled) => {
+								console.log("Cheat mode enabled:", enabled);
+							}}
+						/>
+						<SlideSelector
+							onLengthChange={(length) => {
+								console.log(`Selected word length: ${length}`);
+							}}
+							defaultLength={5}
+						/>
+
 						<Button text="New game" />
-						<Button text="cheat" />
 						<button
 							onClick={handleSubmit}
 							className="ml-auto bg-yellow-50 text-black px-3 py-1 rounded-full font-bold"
