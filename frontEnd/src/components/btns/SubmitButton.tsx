@@ -43,7 +43,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
 						fill="currentColor"
-						className="w-9 h-9 text-amber-400 animate-[pulse_0.75s_ease-in-out_infinite]"
+						className="w-10 h-10 text-amber-400 animate-[pulse_0.75s_ease-in-out_infinite]"
 					>
 						<path
 							fillRule="evenodd"
@@ -57,7 +57,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
 						fill="currentColor"
-						className="w-9 h-9 cursor-not-allowed"
+						className="w-10 h-10 cursor-not-allowed"
 					>
 						<path
 							fillRule="evenodd"
@@ -71,7 +71,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
 						fill="currentColor"
-						className="w-9 h-9 hover:scale-110 transition-transform cursor-pointer"
+						className="w-10 h-10 hover:scale-110 transition-transform cursor-pointer"
 					>
 						<path
 							fillRule="evenodd"

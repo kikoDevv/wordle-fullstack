@@ -47,7 +47,7 @@ const RepeatLetterToggle: React.FC<RepeatLetterToggleProps> = ({
 					strokeLinejoin="round"
 				/>
 			</svg>
-			{isActive ? "Repeats On" : "Allow Repeats"}
+			{isActive ? "Repeats On" : "Word Repeats"}
 		</button>
 	);
 };

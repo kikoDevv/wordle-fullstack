@@ -67,9 +67,9 @@ export default function Home() {
 			<div>
 				{/*---------------Upper section-------------*/}
 				{submissions.length > 0 && (
-					<div className="grid bg-neutral-700 rounded-3xl mb-1 py-1 flex-wrap">
+					<div className="grid bg-neutral-700 rounded-3xl mb-1  flex-wrap py-4">
 						{correctWordsCollection.map((wordFeedback, subIndex) => (
-							<div key={subIndex} className="flex justify-center mb-1">
+							<div key={subIndex} className="flex justify-center my-0.5">
 								{wordFeedback.map((charInfo, charIndex) => (
 									<h1
 										key={`sub-${subIndex}-char-${charIndex}`}
@@ -89,7 +89,12 @@ export default function Home() {
 					</div>
 				)}
 				{/*------------------Lower section--------------------*/}
-				<div className="bg-neutral-700 rounded-3xl w-dvh">
+				{submissions.length == 0 && (
+					<h1 className="place-self-center font-extrabold text-2xl mb-5">
+					May fortune smile upon you
+					</h1>
+				)}
+				<div className="bg-neutral-700 rounded-3xl">
 					<div className="flex justify-center">
 						{words.map((char, index) => (
 							<h1
@@ -135,6 +140,7 @@ export default function Home() {
 							onClick={handleSubmit}
 							disabled={words.length === 0 || isSubmitting}
 							isSubmitting={isSubmitting}
+							className="pl-20"
 						/>
 					</div>
 				</div>
