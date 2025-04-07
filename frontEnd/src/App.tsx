@@ -11,7 +11,6 @@ function App() {
 		<BrowserRouter>
 			<div className="flex flex-col min-h-screen">
 				<Header />
-				<main className="flex-grow pt-16">
 					{" "}
 					<Routes>
 						<Route path="/" element={<Home />} />
@@ -19,7 +18,6 @@ function App() {
 						<Route path="Score" element={<Score />} />
 						<Route path="*" element={<PageNotFound />} />
 					</Routes>
-				</main>
 			</div>
 		</BrowserRouter>
 	);

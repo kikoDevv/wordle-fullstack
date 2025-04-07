@@ -2,7 +2,7 @@ import Button from "../components/btns/Button.js";
 import React, { useState, useEffect } from "react";
 import { GetFeedback } from "../services/api/targetWord.js";
 import SlideSelector from "../components/btns/SlideSelector.js";
-
+import SubmitButton from "../components/btns/SubmitButton.js";
 import RepeatLetterToggle from "../components/btns/RepeatToggle.js";
 import CheatModeToggle from "../components/btns/CheatToggle.js";
 
@@ -18,6 +18,8 @@ export default function Home() {
 		[]
 	);
 
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTypedValue(e.target.value);
 	};
@@ -27,36 +29,45 @@ export default function Home() {
 		setWords(characters);
 	}, [typedValue]);
 	//-------onSubmit do this-------
+	// Modified handleSubmit to handle submission state
 	const handleSubmit = () => {
 		if (words.length > 0) {
-			const targetWord = "hellow";
+			setIsSubmitting(true);
 
-			const newSubmission = [...words];
+			// Simulate a slight delay for the submission process
+			setTimeout(() => {
+				const targetWord = "hellow";
 
-			const correctWordIs = GetFeedback(newSubmission.join(""), targetWord);
-			console.log("correctWordIs--->:", correctWordIs);
+				const newSubmission = [...words];
 
-			// Update submissions state
-			setSubmissions([...submissions, newSubmission]);
-			setTypedValue("");
+				const correctWordIs = GetFeedback(newSubmission.join(""), targetWord);
+				console.log("correctWordIs--->:", correctWordIs);
 
-			// save all of the corrected words with the feedback
-			setCorrectWordsCollection([...correctWordsCollection, correctWordIs]);
+				// Update submissions state
+				setSubmissions([...submissions, newSubmission]);
+				setTypedValue("");
+
+				// save all of the corrected words with the feedback
+				setCorrectWordsCollection([...correctWordsCollection, correctWordIs]);
+				setIsSubmitting(false);
+			}, 500);
 		}
 	};
 	// console.log("correct words collection-->", correctWordsCollection);
 	//----key press for enter or return-------
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter") {
+		if (e.key === "Enter" && !isSubmitting && words.length > 0) {
 			handleSubmit();
 		}
 	};
 
+	//-----------------------------Root-----------------------------------------
 	return (
 		<div className="h-screen flex items-center justify-center">
 			<div>
+				{/*---------------Upper section-------------*/}
 				{submissions.length > 0 && (
-					<div className="grid bg-neutral-700 rounded-2xl mb-1 py-1 flex-wrap">
+					<div className="grid bg-neutral-700 rounded-3xl mb-1 py-1 flex-wrap">
 						{correctWordsCollection.map((wordFeedback, subIndex) => (
 							<div key={subIndex} className="flex justify-center mb-1">
 								{wordFeedback.map((charInfo, charIndex) => (
@@ -77,8 +88,8 @@ export default function Home() {
 						))}
 					</div>
 				)}
-
-				<div className="bg-neutral-700 rounded-2xl w-dvh">
+				{/*------------------Lower section--------------------*/}
+				<div className="bg-neutral-700 rounded-3xl w-dvh">
 					<div className="flex justify-center">
 						{words.map((char, index) => (
 							<h1
@@ -120,12 +131,11 @@ export default function Home() {
 						/>
 
 						<Button text="New game" />
-						<button
+						<SubmitButton
 							onClick={handleSubmit}
-							className="ml-auto bg-yellow-50 text-black px-3 py-1 rounded-full font-bold"
-						>
-							Submit
-						</button>
+							disabled={words.length === 0 || isSubmitting}
+							isSubmitting={isSubmitting}
+						/>
 					</div>
 				</div>
 			</div>

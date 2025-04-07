@@ -36,7 +36,7 @@ const SlideSelector: React.FC<SlideSelectorProps> = ({
 			const timer = setTimeout(() => {
 				setIsExpanded(false);
 				setIsSliding(false);
-			}, 1000); // Close after 1 second of no sliding activity
+			}, 500); // Close after 1 second of no sliding activity
 
 			return () => clearTimeout(timer);
 		}
