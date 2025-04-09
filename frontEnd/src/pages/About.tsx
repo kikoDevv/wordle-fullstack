@@ -1,12 +1,12 @@
 import React from "react";
 import Button from "../components/btns/Button";
+import { Link } from "react-router-dom";
 
 export default function About() {
 	return (
 		<div className="h-screen flex items-center justify-center">
 			<div className="w-dvh px-4">
-				<div className="bg-neutral-700 rounded-3xl mb-6 overflow-hidden">
-					{/* Header with logo */}
+				<div className="bg-neutral-700 rounded-3xl mb-6 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-neutral-700">
 					<div className="bg-neutral-800 p-6 text-center">
 						<h1 className="text-3xl font-bold mb-2">About Wordle</h1>
 						<p className="text-neutral-400">
@@ -14,10 +14,8 @@ export default function About() {
 						</p>
 					</div>
 
-					{/* Content section */}
 					<div className="p-6">
 						<div className="grid gap-8">
-							{/* How to play section */}
 							<div>
 								<h2 className="text-xl font-bold mb-3 flex items-center">
 									<svg
@@ -59,7 +57,6 @@ export default function About() {
 								</div>
 							</div>
 
-							{/* Game features section */}
 							<div>
 								<h2 className="text-xl font-bold mb-3 flex items-center">
 									<svg
@@ -109,20 +106,17 @@ export default function About() {
 								</div>
 							</div>
 
-							{/* Credits and version section */}
 							<div className="mt-4 text-center">
 								<p className="text-neutral-400 text-sm mb-4">
 									Version 1.0 • Created by KikoDevv
 								</p>
 								<div className="flex justify-center gap-4">
-									<Button
-										text="Start Playing"
-										onClick={() => (window.location.href = "/")}
-									/>
-									<Button
-										text="View Scores"
-										onClick={() => (window.location.href = "/score")}
-									/>
+									<Link to="/">
+										<Button text="Start Playing" />
+									</Link>
+									<Link to="/score">
+										<Button text="View Scores" />
+									</Link>
 								</div>
 							</div>
 						</div>
