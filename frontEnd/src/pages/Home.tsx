@@ -5,6 +5,7 @@ import SubmitButton from "../components/btns/SubmitButton";
 import RepeatLetterToggle from "../components/btns/RepeatToggle";
 import CheatModeToggle from "../components/btns/CheatToggle";
 import { wordService } from "../services/api/wordService";
+import RevealingText from "../components/RevealingText";
 
 export default function Home() {
 	//-------State for the current input value------
@@ -28,6 +29,9 @@ export default function Home() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// State to control the animation refresh
+	const [animationKey, setAnimationKey] = useState(0);
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTypedValue(e.target.value);
 	};
@@ -41,6 +45,7 @@ export default function Home() {
 	const startNewGame = async () => {
 		setIsSubmitting(true);
 		setError(null);
+		setAnimationKey((prev) => prev + 1); // Trigger animation to restart
 		try {
 			const response = await wordService.startGame({
 				wordLength,
@@ -130,22 +135,18 @@ export default function Home() {
 		}
 	};
 
-	// Handle game setting changes
 	const handleLengthChange = (length: number) => {
 		setWordLength(length);
-		// Restart game when length changes to ensure target word matches new length
 		startNewGame();
 	};
 
 	const handleRepeatsChange = (isAllowed: boolean) => {
 		setAllowRepeats(isAllowed);
-		// Restart game when setting changes
 		startNewGame();
 	};
 
 	const handleCheatModeChange = (enabled: boolean) => {
 		setIsCheatMode(enabled);
-		// Restart game to apply cheat mode
 		startNewGame();
 	};
 
@@ -178,9 +179,14 @@ export default function Home() {
 				)}
 				{/*------------------Lower section--------------------*/}
 				{submissions.length == 0 && (
-					<h1 className="place-self-center font-extrabold text-2xl mb-5">
-						May fortune smile upon you
-					</h1>
+					<div className="place-self-center mb-5 text-center">
+						<RevealingText
+							key={animationKey}
+							text="May fortune smile upon you!"
+							className="font-extrabold text-2xl"
+							dotColor="bg-amber-300"
+						/>
+					</div>
 				)}
 				<div className="bg-neutral-700 rounded-3xl">
 					<div className="flex justify-center">

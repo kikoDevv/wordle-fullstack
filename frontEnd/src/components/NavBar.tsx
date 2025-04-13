@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 
 export default function NavBar() {
 	const [isOpen, setIsOpen] = useState(false);
-	const toggleSidebar = () => setIsOpen(!isOpen);
+	const [hideSlideBtn, setHideSlideBtn] = useState(false);
+
+	const toggleSidebar = () => {
+		setIsOpen(!isOpen);
+		setHideSlideBtn(!hideSlideBtn);
+	};
 
 	useEffect(() => {
 		const mainContent = document.getElementById("root");
@@ -24,10 +29,11 @@ export default function NavBar() {
 	}, [isOpen]);
 
 	return (
-		<div className="relative">
-			<button
+		<div>
+			{!hideSlideBtn && (
+				<button
 				onClick={toggleSidebar}
-				className="fixed top-4 left-4 z-50 text-white rounded-md hover:bg-gray-600 focus:outline-none transition-colors duration-200 cursor-pointer"
+				className="fixed z-10 text-white cursor-pointer mt-5 ml-5"
 				aria-label="Toggle sidebar"
 			>
 				{isOpen ? (
@@ -69,7 +75,7 @@ export default function NavBar() {
 					</svg>
 				)}
 			</button>
-
+			)}
 			{isOpen && (
 				<div
 					className="fixed inset-0 bg-black bg-opacity-30 z-30 transition-opacity duration-300 lg:hidden"
@@ -83,8 +89,52 @@ export default function NavBar() {
 					isOpen ? "translate-x-0" : "-translate-x-full"
 				} z-40 overflow-y-auto`}
 			>
-				<div className="px-6 py-5 border-b border-gray-700">
+				<div className="flex justify-between px-6 py-5 border-b border-gray-700">
 					<h2 className="text-xl font-bold">Wordle Game</h2>
+					<button
+						onClick={toggleSidebar}
+						className=" text-white cursor-pointer"
+						aria-label="Toggle sidebar"
+					>
+						{isOpen ? (
+							<svg
+								width="32"
+								height="32"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						) : (
+							<svg
+								width="32"
+								height="32"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M2.75 6C2.75 4.20508 4.20508 2.75 6 2.75H18C19.7949 2.75 21.25 4.20508 21.25 6V18C21.25 19.7949 19.7949 21.25 18 21.25H6C4.20508 21.25 2.75 19.7949 2.75 18V6Z"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+								<path
+									d="M8.75 21.25V2.75"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+						)}
+					</button>
 				</div>
 
 				<nav className="mt-5">

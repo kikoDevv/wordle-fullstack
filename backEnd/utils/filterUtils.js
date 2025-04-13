@@ -1,10 +1,9 @@
-
-
 /**
- * @param {Array<Object>} highscores - Array of highscore objects
- * @param {number} wordLength - Length of word to filter by
- * @returns {Array<Object>} Filtered highscores
+ * @param {Array<Object>} highscores
+ * @param {number} wordLength
+ * @returns {Array<Object>}
  */
+
 const filterByWordLength = (highscores, wordLength) => {
 	if (!wordLength || wordLength <= 0) {
 		return highscores;
