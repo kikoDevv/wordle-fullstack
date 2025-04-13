@@ -89,7 +89,7 @@ const RevealingText: React.FC<RevealingTextProps> = ({
 		};
 
 		//-----Start animation after a short delay--------
-		const timeout = setTimeout(animateDot, 300);
+		const timeout = setTimeout(animateDot, 600);
 
 		return () => {
 			clearTimeout(timeout);

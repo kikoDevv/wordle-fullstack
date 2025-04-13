@@ -179,7 +179,7 @@ export default function Home() {
 				)}
 				{/*------------------Lower section--------------------*/}
 				{submissions.length == 0 && (
-					<div className="place-self-center mb-5 text-center">
+					<div className="place-self-center mb-2 text-center pr-5">
 						<RevealingText
 							key={animationKey}
 							text="May fortune smile upon you!"
