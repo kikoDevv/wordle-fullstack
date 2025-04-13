@@ -1,10 +1,11 @@
-import Button from "../components/btns/Button.js";
+import Button from "../components/btns/Button";
 import React, { useState, useEffect } from "react";
-import { GetFeedback } from "../services/api/targetWord.js";
-import SlideSelector from "../components/btns/SlideSelector.js";
-import SubmitButton from "../components/btns/SubmitButton.js";
-import RepeatLetterToggle from "../components/btns/RepeatToggle.js";
-import CheatModeToggle from "../components/btns/CheatToggle.js";
+import SlideSelector from "../components/btns/SlideSelector";
+import SubmitButton from "../components/btns/SubmitButton";
+import RepeatLetterToggle from "../components/btns/RepeatToggle";
+import CheatModeToggle from "../components/btns/CheatToggle";
+import { wordService } from "../services/api/wordService";
+import RevealingText from "../components/RevealingText";
 
 export default function Home() {
 	//-------State for the current input value------
@@ -14,11 +15,22 @@ export default function Home() {
 	//--------State to store all submitted entries------
 	const [submissions, setSubmissions] = useState<string[][]>([]);
 
+	// Game config states
+	const [wordLength, setWordLength] = useState(5);
+	const [allowRepeats, setAllowRepeats] = useState(false);
+	const [isCheatMode, setIsCheatMode] = useState(false);
+	const [gameId, setGameId] = useState<string | null>(null);
+	const [targetWord, setTargetWord] = useState<string | null>(null);
+
 	const [correctWordsCollection, setCorrectWordsCollection] = useState<any[]>(
 		[]
 	);
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	// State to control the animation refresh
+	const [animationKey, setAnimationKey] = useState(0);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTypedValue(e.target.value);
@@ -28,37 +40,114 @@ export default function Home() {
 		const characters = typedValue.split("").filter((char) => char !== " ");
 		setWords(characters);
 	}, [typedValue]);
+
+	// Start a new game
+	const startNewGame = async () => {
+		setIsSubmitting(true);
+		setError(null);
+		setAnimationKey((prev) => prev + 1); // Trigger animation to restart
+		try {
+			const response = await wordService.startGame({
+				wordLength,
+				allowRepeats,
+			});
+
+			setGameId(response.gameId);
+			// In cheat mode, we'll get the target word back
+			if (isCheatMode && response.targetWord) {
+				setTargetWord(response.targetWord);
+				console.log("Cheat mode ON - Target word:", response.targetWord);
+			} else {
+				setTargetWord(null);
+			}
+
+			// Reset game state
+			setSubmissions([]);
+			setCorrectWordsCollection([]);
+			setTypedValue("");
+		} catch (err) {
+			setError("Failed to start a new game. Please try again.");
+			console.error("Error starting new game:", err);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	// Initialize game on first load
+	useEffect(() => {
+		startNewGame();
+	}, []);
+
 	//-------onSubmit do this-------
-	// Modified handleSubmit to handle submission state
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (words.length > 0) {
 			setIsSubmitting(true);
+			setError(null);
 
-			// Simulate a slight delay for the submission process
-			setTimeout(() => {
-				const targetWord = "hellow";
+			try {
+				const guess = words.join("");
+
+				//--Check if the guess length matches the current word length setting--
+				if (guess.length !== wordLength) {
+					setError(`Your guess must be ${wordLength} letters long.`);
+					setIsSubmitting(false);
+					return;
+				}
+
+				const response = await wordService.checkGuess(
+					guess,
+					isCheatMode ? targetWord : undefined,
+					gameId || undefined
+				);
 
 				const newSubmission = [...words];
-
-				const correctWordIs = GetFeedback(newSubmission.join(""), targetWord);
-				console.log("correctWordIs--->:", correctWordIs);
-
-				// Update submissions state
 				setSubmissions([...submissions, newSubmission]);
 				setTypedValue("");
 
-				// save all of the corrected words with the feedback
-				setCorrectWordsCollection([...correctWordsCollection, correctWordIs]);
+				setCorrectWordsCollection([...correctWordsCollection, response.result]);
+			} catch (err: any) {
+				let errorMessage = "Failed to check your guess. Please try again.";
+				if (err.response && err.response.data && err.response.data.error) {
+					errorMessage = err.response.data.error;
+				} else if (err.message) {
+					errorMessage = err.message;
+				}
+
+				if (errorMessage.includes("length doesn't match")) {
+					errorMessage += " Starting a new game...";
+					setTimeout(() => {
+						startNewGame();
+					}, 2000);
+				}
+
+				setError(errorMessage);
+				console.error("Error submitting guess:", err);
+			} finally {
 				setIsSubmitting(false);
-			}, 500);
+			}
 		}
 	};
-	// console.log("correct words collection-->", correctWordsCollection);
+
 	//----key press for enter or return-------
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" && !isSubmitting && words.length > 0) {
 			handleSubmit();
 		}
+	};
+
+	const handleLengthChange = (length: number) => {
+		setWordLength(length);
+		startNewGame();
+	};
+
+	const handleRepeatsChange = (isAllowed: boolean) => {
+		setAllowRepeats(isAllowed);
+		startNewGame();
+	};
+
+	const handleCheatModeChange = (enabled: boolean) => {
+		setIsCheatMode(enabled);
+		startNewGame();
 	};
 
 	//-----------------------------Root-----------------------------------------
@@ -90,9 +179,14 @@ export default function Home() {
 				)}
 				{/*------------------Lower section--------------------*/}
 				{submissions.length == 0 && (
-					<h1 className="place-self-center font-extrabold text-2xl mb-5">
-					May fortune smile upon you
-					</h1>
+					<div className="place-self-center mb-2 text-center pr-5">
+						<RevealingText
+							key={animationKey}
+							text="May fortune smile upon you!"
+							className="font-extrabold text-2xl"
+							dotColor="bg-amber-300"
+						/>
+					</div>
 				)}
 				<div className="bg-neutral-700 rounded-3xl">
 					<div className="flex justify-center">
@@ -108,34 +202,31 @@ export default function Home() {
 					<div className="w-full">
 						<input
 							type="input"
-							placeholder="Type the worlds here or make any changes before starting the game"
+							placeholder="Type the words here or make any changes before starting the game"
 							className="w-full p-4 border-none outline-none"
 							value={typedValue}
 							onChange={handleInputChange}
 							onKeyDown={handleKeyPress}
 						/>
 					</div>
+					{error && <div className="text-red-500 text-center p-2">{error}</div>}
 					{/* //-------------buttons------------------ */}
 					<div className="flex px-2 py-2">
 						<RepeatLetterToggle
-							onChange={(allowed) => {
-								console.log("Repeat letters allowed:", allowed);
-							}}
+							onChange={handleRepeatsChange}
+							defaultActive={allowRepeats}
 						/>
 
 						<CheatModeToggle
-							onChange={(enabled) => {
-								console.log("Cheat mode enabled:", enabled);
-							}}
+							onChange={handleCheatModeChange}
+							defaultActive={isCheatMode}
 						/>
 						<SlideSelector
-							onLengthChange={(length) => {
-								console.log(`Selected word length: ${length}`);
-							}}
-							defaultLength={5}
+							onLengthChange={handleLengthChange}
+							defaultLength={wordLength}
 						/>
 
-						<Button text="New game" />
+						<Button text="New game" onClick={startNewGame} />
 						<SubmitButton
 							onClick={handleSubmit}
 							disabled={words.length === 0 || isSubmitting}
