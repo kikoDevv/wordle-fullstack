@@ -59,11 +59,24 @@ const getRandomWord = async (length, allowRepeats) => {
 /**
  * @param {string} guess
  * @param {string} targetWord
- * @returns {Array<{letter: string, status: string}>}
+ * @returns {Array<{letter: string, result: string}>}
  */
 const checkGuess = (guess, targetWord) => {
+	if (!targetWord || typeof targetWord !== "string") {
+		throw new Error("Invalid target word");
+	}
+
+	if (!guess || typeof guess !== "string") {
+		throw new Error("Invalid guess");
+	}
+
 	if (guess.length !== targetWord.length) {
-		throw new Error("Guess length does not match target word length");
+		console.log(
+			`Length mismatch: Guess "${guess}" (${guess.length}) vs Target "${targetWord}" (${targetWord.length})`
+		);
+		throw new Error(
+			`Guess length (${guess.length}) does not match target word length (${targetWord.length})`
+		);
 	}
 
 	const result = [];
@@ -73,23 +86,23 @@ const checkGuess = (guess, targetWord) => {
 		const letter = guess[i];
 
 		if (letter === targetWord[i]) {
-			result.push({ letter, status: "correct" });
+			result.push({ letter, result: "correct" });
 			targetLetters[i] = null;
 		} else {
-			result.push({ letter, status: "pending" });
+			result.push({ letter, result: "pending" });
 		}
 	}
 
 	for (let i = 0; i < result.length; i++) {
-		if (result[i].status === "pending") {
+		if (result[i].result === "pending") {
 			const letter = result[i].letter;
 			const targetIndex = targetLetters.indexOf(letter);
 
 			if (targetIndex !== -1) {
-				result[i].status = "misplaced";
+				result[i].result = "misplaced";
 				targetLetters[targetIndex] = null;
 			} else {
-				result[i].status = "incorrect";
+				result[i].result = "incorrect";
 			}
 		}
 	}

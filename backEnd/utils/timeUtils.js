@@ -1,14 +1,14 @@
 
 /**
- * @returns {number} Timestamp in milliseconds
+ * @returns {number}
  */
 const startGameSession = () => {
 	return Date.now();
 };
 
 /**
- * @param {number} startTime - Timestamp when the game started
- * @returns {number} Duration in milliseconds
+ * @param {number} startTime
+ * @returns {number}
  */
 const calculateGameDuration = (startTime) => {
 	const endTime = Date.now();
@@ -16,8 +16,8 @@ const calculateGameDuration = (startTime) => {
 };
 
 /**
- * @param {number} duration - Duration in milliseconds
- * @returns {string} Formatted duration string (MM:SS.mmm)
+ * @param {number} duration
+ * @returns {string}
  */
 const formatDuration = (duration) => {
 	const totalSeconds = Math.floor(duration / 1000);
@@ -31,7 +31,7 @@ const formatDuration = (duration) => {
 };
 
 /**
- * @returns {Object} Object containing start time and methods
+ * @returns {Object}
  */
 const createGameSession = () => {
 	const startTime = startGameSession();
