@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 
 interface RevealingTextProps {
 	text: string;
@@ -18,116 +18,142 @@ const RevealingText: React.FC<RevealingTextProps> = ({
 	const [dotPosition, setDotPosition] = useState(-10);
 	const [visibleChars, setVisibleChars] = useState(0);
 	const [animationComplete, setAnimationComplete] = useState(false);
-
-
-	const letterPositions = useMemo(() => {
-		const startPosition = -1;
-		const totalWidth = 90;
-		const positions: number[] = [];
-
-
-		const charCount = text.length;
-		const charWidth = totalWidth / Math.max(1, charCount);
-
-		for (let i = 0; i < charCount; i++) {
-			positions.push(startPosition + i * charWidth + 3);
-		}
-		return positions;
-	}, [text]);
-
-	const finalDotPosition = useMemo(() => {
-		if (letterPositions.length === 0) return 95;
-
-		const lastLetterPos = letterPositions[letterPositions.length - 1];
-		return lastLetterPos + 16.4; //------>Position dot just after the last letter
-	}, [letterPositions]);
+	const [isRevealing, setIsRevealing] = useState(true);
+	const [wrapperWidth, setWrapperWidth] = useState(0);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+	const letterCenters = useRef<number[]>([]);
 
 	useEffect(() => {
+		if (!text) return;
+
 		setDotPosition(-10);
 		setVisibleChars(0);
 		setAnimationComplete(false);
+		setIsRevealing(true);
+		setWrapperWidth(0);
 
-		//-----Animation settings - consistent speed------
-		const dotAnimationDuration = 1000;
-
-		const animateDot = () => {
-			const startTime = Date.now();
-			const startPos = -5;
-			const endPos = 105;
-
-			const animate = () => {
-				const elapsed = Date.now() - startTime;
-				const progress = Math.min(elapsed / dotAnimationDuration, 1);
-
-				const newPosition = startPos + (endPos - startPos) * progress;
-				setDotPosition(newPosition);
-
-				let visibleCount = 0;
-				for (let i = 0; i < letterPositions.length; i++) {
-					if (newPosition >= letterPositions[i]) {
-						visibleCount = i + 1;
-					} else {
-						break;
-					}
+		setTimeout(() => {
+			const centers: number[] = [];
+			letterRefs.current.forEach((span) => {
+				if (span) {
+					const { offsetLeft, offsetWidth } = span;
+					centers.push(offsetLeft + offsetWidth / 2);
 				}
-				setVisibleChars(visibleCount);
+			});
+			letterCenters.current = centers;
 
-				if (progress < 1) {
-					requestAnimationFrame(animate);
-				} else {
-					setTimeout(() => {
-						setDotPosition(finalDotPosition);
-						setAnimationComplete(true);
-						if (onComplete) {
-							onComplete();
-						}
-					}, 300);
+			startRevealAnimation();
+		}, 90);
+	}, [text]);
+
+	//----------------revealing-------------------
+	const startRevealAnimation = () => {
+		const centers = letterCenters.current;
+		const total = centers.length;
+		if (total === 0) return;
+
+		const revealDuration = 1000;
+		const interval = revealDuration / total;
+		let i = 0;
+
+		const timer = setInterval(() => {
+			if (i < total) {
+				const pos = centers[i];
+				setDotPosition(pos);
+				setWrapperWidth(pos + 10);
+				setVisibleChars(i + 1);
+				i++;
+			} else {
+				clearInterval(timer);
+				setAnimationComplete(true);
+
+				//----delay to start unreveal-----
+				setTimeout(() => {
+					setIsRevealing(false);
+					startUnrevealAnimation();
+				}, 2000);
+			}
+		}, interval);
+	};
+
+	//-----unreveal animation----
+	const startUnrevealAnimation = () => {
+		const centers = letterCenters.current;
+		const total = centers.length;
+		if (total === 0) return;
+
+		const unrevealDuration = 1000;
+		const interval = unrevealDuration / total;
+		let i = total - 1;
+
+		setVisibleChars(total);
+
+		const timer = setInterval(() => {
+			if (i >= 0) {
+				const pos = centers[i];
+				setDotPosition(pos);
+
+				setVisibleChars(i);
+
+				setWrapperWidth(pos + 1);
+				i--;
+			} else {
+				clearInterval(timer);
+
+				setVisibleChars(0);
+				setWrapperWidth(0);
+
+				if (onComplete) {
+					setTimeout(() => onComplete(), 300);
 				}
-			};
-
-			requestAnimationFrame(animate);
-		};
-
-		//-----Start animation after a short delay--------
-		const timeout = setTimeout(animateDot, 600);
-
-		return () => {
-			clearTimeout(timeout);
-		};
-	}, [text, letterPositions, onComplete, finalDotPosition]);
+			}
+		}, interval);
+	};
 
 	return (
-		<div className={`relative ${className}`}>
-			{/*-----Render each character-----------------------------*/}
-			<div className={`${textColor}`}>
-				{text.split('').map((char, index) => (
-					<span
-						key={index}
-						className="transition-opacity duration-75"
-						style={{
-							opacity: index < visibleChars ? 1 : 0,
-							display: "inline-block",
-							whiteSpace: "pre",
-							visibility: char === ' ' ? 'visible' : undefined // Make spaces take up space
-						}}
-					>
-						{char}
-					</span>
-				))}
+		<div ref={containerRef} className={`relative ${className}`}>
+			<div
+				className="overflow-hidden inline-block whitespace-nowrap transition-all"
+				style={{
+					width: `${wrapperWidth}px`,
+					transition: !isRevealing ? "width 0.2s ease" : "width 0.1s ease",
+				}}
+			>
+				{text.split("").map((char, index) => {
+					const isVisible = isRevealing
+						? index < visibleChars
+						: index < visibleChars;
+
+					return (
+						<span
+							key={index}
+							ref={(el) => (letterRefs.current[index] = el)}
+							className={`inline-block transition-opacity ${textColor}`}
+							style={{
+								whiteSpace: "pre",
+								display: "inline-block",
+								width: char === " " ? "0.25em" : undefined,
+								marginRight: char === " " ? "0.25em" : undefined,
+							}}
+						>
+							{char}
+						</span>
+					);
+				})}
 			</div>
 
-			{/* Dot that slides */}
 			<div
-				className="rounded-full bg-white"
+				className={`absolute top-1/2 rounded-full transition-all ${
+					dotColor || "bg-white"
+				}`}
 				style={{
-					width: "20px",
-					height: "20px",
-					position: "absolute",
-					left: `${dotPosition}%`,
-					top: "50%",
-					transform: "translateY(-50%)",
-					boxShadow: "0 0 8px rgba(255,255,255,0.7)",
-					transition: "none",
+					left: `${dotPosition}px`,
+					width: "1.5rem",
+					height: "1.5rem",
+					transform: `translateY(-60%) scale(1)`, // Always keep scale at 1
+					boxShadow: "0 0 10px 2px rgba(255, 255, 255, 0.6)",
+					transition: animationComplete ? "left 0.2s ease" : "none",
 					zIndex: 1,
 				}}
 			/>

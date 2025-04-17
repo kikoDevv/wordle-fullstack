@@ -8,6 +8,8 @@ import ScoreModal from "../components/ScoreModal";
 import { wordService } from "../services/api/wordService";
 import RevealingText from "../components/RevealingText";
 
+import Revv from "../components/Revv";
+
 export default function Home() {
 	//-------State for the current input value------
 	const [typedValue, setTypedValue] = useState("");
@@ -258,18 +260,20 @@ export default function Home() {
 						))}
 					</div>
 				)}
-				{/*------------------Lower section--------------------*/}
 				{submissions.length == 0 && (
 					<div className="place-self-center mb-2 text-center pr-5">
-						<RevealingText
-							key={animationKey}
-							text="May fortune smile upon you!"
-							className="font-extrabold text-2xl"
-							dotColor="bg-amber-300"
-						/>
+						<div className="flex justify-center">
+							<RevealingText
+								key={animationKey}
+								text="May fortune smile upon you! "
+								className="font-extrabold text-2xl"
+								dotColor="bg-amber-300"
+								/>
+						</div>
 					</div>
 				)}
 
+				{/*------------------Lower section--------------------*/}
 				{successMessage && (
 					<div className="bg-green-600 text-white text-center p-2 rounded-lg mb-2">
 						{successMessage}
