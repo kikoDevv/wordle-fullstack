@@ -1,89 +1,53 @@
-const fs = require("fs").promises;
-const path = require("path");
+const mongoose = require("mongoose");
 
-const scoresFilePath = path.join(__dirname, "..", "data", "scores.json");
+// Define Score Schema
+const ScoreSchema = new mongoose.Schema({
+	playerName: {
+		type: String,
+		required: [true, "Player name is required"],
+		trim: true,
+	},
+	targetWord: {
+		type: String,
+		required: [true, "Target word is required"],
+		trim: true,
+	},
+	guesses: {
+		type: Number,
+		required: [true, "Number of guesses is required"],
+		min: [1, "Must have at least one guess"],
+	},
+	duration: {
+		type: Number,
+		required: [true, "Game duration is required"],
+		min: [0, "Duration cannot be negative"],
+	},
+	wordLength: {
+		type: Number,
+		required: [true, "Word length is required"],
+		min: [3, "Word length must be at least 3"],
+	},
+	uniqueLettersOnly: {
+		type: Boolean,
+		default: false,
+	},
+	gameId: {
+		type: String,
+	},
+	date: {
+		type: Date,
+		default: Date.now,
+	},
+});
 
-const initializeScoresFile = async () => {
-	try {
-		await fs.access(scoresFilePath);
-	} catch (error) {
-		await fs.writeFile(scoresFilePath, JSON.stringify([], null, 2));
-	}
+//----static methods for the Score model---
+ScoreSchema.statics.getAllScores = async function () {
+	return await this.find().sort({ date: -1 });
 };
 
-//--Get all scores from the file--
-const getAllScores = async () => {
-	await initializeScoresFile();
-
-	try {
-		const data = await fs.readFile(scoresFilePath, "utf8");
-		return JSON.parse(data);
-	} catch (error) {
-		console.error("Error reading scores file:", error);
-		return [];
-	}
+ScoreSchema.statics.saveScore = async function (scoreData) {
+	return await this.create(scoreData);
 };
 
-//--Save a new score to the file-----
-const saveScore = async (scoreData) => {
-	await initializeScoresFile();
-
-	try {
-		const {
-			playerName,
-			targetWord,
-			guesses,
-			duration,
-			wordLength,
-			uniqueLettersOnly,
-			gameId,
-		} = scoreData;
-
-		if (
-			!playerName ||
-			!targetWord ||
-			guesses === undefined ||
-			duration === undefined
-		) {
-			throw new Error("Missing required score data");
-		}
-
-		const scores = await getAllScores();
-
-		const newScore = {
-			id: generateId(),
-			playerName,
-			targetWord,
-			guesses,
-			duration,
-			wordLength: wordLength || targetWord.length,
-			uniqueLettersOnly:
-				uniqueLettersOnly !== undefined ? uniqueLettersOnly : false,
-			gameId,
-			date: new Date().toISOString(),
-		};
-
-		scores.push(newScore);
-        console.log("new score----->", newScore, "all scores------>", scores);
-
-		await fs.writeFile(scoresFilePath, JSON.stringify(scores, null, 2));
-
-		return newScore;
-	} catch (error) {
-		console.error("Error saving score:", error);
-		throw error;
-	}
-};
-
-//--Generate ID for a score-------
-const generateId = () => {
-	return (
-		Math.random().toString(36).substring(2, 15) +
-		Math.random().toString(36).substring(2, 15)
-	);
-};
-
-module.exports = {
-	getAllScores,
-	saveScore,
-};
+const Score = mongoose.model("Score", ScoreSchema);
+module.exports = Score;

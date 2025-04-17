@@ -162,10 +162,11 @@ export default function NavBar() {
 							</Link>
 						</li>
 						<li>
-							<Link
-								to="Scores"
+							<a
+								href="http://localhost:5080/scores"
 								onClick={toggleSidebar}
 								className="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors duration-200 rounded-lg mx-2"
+								target="_self"
 							>
 								<svg
 									className="w-5 h-5 mr-3"
@@ -181,7 +182,7 @@ export default function NavBar() {
 									/>
 								</svg>
 								Scores
-							</Link>
+							</a>
 						</li>
 						<li>
 							<Link
