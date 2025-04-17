@@ -9,55 +9,55 @@
  * @returns {Array} - Filtered and sorted scores
  */
 const applyFilters = (scores, filters) => {
-  let filteredScores = [...scores];
-  
-  // Apply wordLength filter
-  if (filters.wordLength !== undefined) {
-    filteredScores = filteredScores.filter(
-      score => score.wordLength === parseInt(filters.wordLength, 10)
-    );
-  }
-  
-  // Apply uniqueLettersOnly filter
-  if (filters.uniqueLettersOnly !== undefined) {
-    // Convert string to boolean if needed
-    const uniqueLettersValue = 
-      typeof filters.uniqueLettersOnly === 'string' 
-        ? filters.uniqueLettersOnly === 'true'
-        : filters.uniqueLettersOnly;
-        
-    filteredScores = filteredScores.filter(
-      score => score.uniqueLettersOnly === uniqueLettersValue
-    );
-  }
-  
-  // Apply sorting
-  const sortBy = filters.sortBy || 'time';
-  const order = filters.order || 'asc';
-  
-  filteredScores.sort((a, b) => {
-    let comparison = 0;
-    
-    switch (sortBy) {
-      case 'time':
-        comparison = a.duration - b.duration;
-        break;
-      case 'guesses':
-        comparison = a.guesses - b.guesses;
-        break;
-      case 'date':
-        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
-        break;
-      default:
-        comparison = a.duration - b.duration;
-    }
-    
-    return order === 'asc' ? comparison : -comparison;
-  });
-  
-  return filteredScores;
+	let filteredScores = [...scores];
+
+	// Apply wordLength filter
+	if (filters.wordLength !== undefined) {
+		filteredScores = filteredScores.filter(
+			(score) => score.wordLength === parseInt(filters.wordLength, 10)
+		);
+	}
+
+	// Apply uniqueLettersOnly filter
+	if (filters.uniqueLettersOnly !== undefined) {
+		// Convert string to boolean if needed
+		const uniqueLettersValue =
+			typeof filters.uniqueLettersOnly === "string"
+				? filters.uniqueLettersOnly === "true"
+				: filters.uniqueLettersOnly;
+
+		filteredScores = filteredScores.filter(
+			(score) => score.uniqueLettersOnly === uniqueLettersValue
+		);
+	}
+
+	// Apply sorting
+	const sortBy = filters.sortBy || "time";
+	const order = filters.order || "asc";
+
+	filteredScores.sort((a, b) => {
+		let comparison = 0;
+
+		switch (sortBy) {
+			case "time":
+				comparison = a.duration - b.duration;
+				break;
+			case "guesses":
+				comparison = a.guesses - b.guesses;
+				break;
+			case "date":
+				comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+				break;
+			default:
+				comparison = a.duration - b.duration;
+		}
+
+		return order === "asc" ? comparison : -comparison;
+	});
+
+	return filteredScores;
 };
 
 module.exports = {
-  applyFilters
+	applyFilters,
 };

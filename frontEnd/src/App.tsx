@@ -10,14 +10,13 @@ function App() {
 	return (
 		<BrowserRouter>
 			<div className="flex flex-col min-h-screen">
-				<Header />
-					{" "}
-					<Routes>
-						<Route path="/" element={<Home />} />
-						<Route path="About" element={<About />} />
-						<Route path="Scores" element={<Scores />} />
-						<Route path="*" element={<PageNotFound />} />
-					</Routes>
+				<Header />{" "}
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="About" element={<About />} />
+					<Route path="Scores" element={<Scores />} />
+					<Route path="*" element={<PageNotFound />} />
+				</Routes>
 			</div>
 		</BrowserRouter>
 	);
