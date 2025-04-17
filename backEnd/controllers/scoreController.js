@@ -1,7 +1,7 @@
 const Score = require("../models/Score");
 const { applyFilters } = require("../utils/filterUtils");
 
-//--- get all the score with filter-------
+//--- get all the score with filter--------
 const getScores = async (req, res) => {
 	try {
 		const query = {};
