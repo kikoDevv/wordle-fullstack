@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Home from "./pages/Home";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import About from "./pages/About";
-import Scores from "./pages/Scores";
 import PageNotFound from "./components/PageNotFound";
 
 function App() {
@@ -14,7 +13,7 @@ function App() {
 				<Routes>
 					<Route path="/" element={<Home />} />
 					<Route path="About" element={<About />} />
-					<Route path="Scores" element={<Scores />} />
+					<Route path="Scores" element={<Navigate to="/scores" replace />} />
 					<Route path="*" element={<PageNotFound />} />
 				</Routes>
 			</div>

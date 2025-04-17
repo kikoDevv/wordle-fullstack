@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 const { loadWords, getRandomWord, checkGuess } = require("./utils/wordUtils");
 const scoreRoutes = require("./routes/scoreRoutes");
 const connectDB = require("./config/db");
@@ -7,6 +8,36 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5080;
+
+// Enable CORS for the React frontend
+app.use(
+	cors({
+		origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+		credentials: true,
+	})
+);
+
+// Set up view engine
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
+
+// Utility functions for templates
+const formatTime = (ms) => {
+	const seconds = Math.floor(ms / 1000);
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = seconds % 60;
+	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
+
+const formatDate = (dateString) => {
+	const date = new Date(dateString);
+	return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+};
+
+// Make utility functions available to all templates
+app.locals.formatTime = formatTime;
+app.locals.formatDate = formatDate;
 
 //----Connect to MongoDB---------
 connectDB();
@@ -21,6 +52,57 @@ const generateGameId = () => Math.random().toString(36).substring(2, 15);
 
 // Register score routes
 app.use("/api/scores", scoreRoutes);
+
+// SSR Routes
+app.get("/scores", async (req, res) => {
+	try {
+		const query = {};
+		const sortBy = req.query.sortBy || "date";
+		const order = req.query.order === "asc" ? 1 : -1;
+
+		if (req.query.wordLength && req.query.wordLength !== "all") {
+			query.wordLength = parseInt(req.query.wordLength);
+		}
+
+		if (
+			req.query.uniqueLettersOnly !== undefined &&
+			req.query.uniqueLettersOnly !== ""
+		) {
+			query.uniqueLettersOnly = req.query.uniqueLettersOnly === "true";
+		}
+
+		const sortOptions = {};
+		sortOptions[sortBy] = order;
+
+		console.log("Scores Query:", query);
+		console.log("Sort Options:", sortOptions);
+
+		const Score = require("./models/Score");
+		const scores = await Score.find(query).sort(sortOptions);
+
+		console.log(`Found ${scores.length} scores`);
+		if (scores.length > 0) {
+			console.log("First score example:", scores[0]);
+		}
+
+		res.render("scores", {
+			title: "Wordle High Scores",
+			scores: scores,
+			filter: {
+				sortBy: sortBy,
+				order: req.query.order || "desc",
+				wordLength: req.query.wordLength || "all",
+				uniqueLettersOnly: req.query.uniqueLettersOnly,
+			},
+		});
+	} catch (error) {
+		console.error("Error rendering scores page:", error);
+		res.status(500).render("error", {
+			message: "Error loading scores",
+			error: process.env.NODE_ENV === "development" ? error : {},
+		});
+	}
+});
 
 app.get("/api/words/random", async (req, res) => {
 	try {

@@ -6,10 +6,8 @@ const connectDB = async () => {
 		const mongoURI =
 			process.env.MONGO_URI || "mongodb://localhost:27017/wordle-game";
 
-		const conn = await mongoose.connect(mongoURI, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-		});
+		console.log("Connecting to MongoDB:", mongoURI);
+		const conn = await mongoose.connect(mongoURI);
 
 		console.log(`MongoDB Connected: ${conn.connection.host}`);
 		return conn;
