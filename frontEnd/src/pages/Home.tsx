@@ -4,6 +4,7 @@ import SlideSelector from "../components/btns/SlideSelector";
 import SubmitButton from "../components/btns/SubmitButton";
 import RepeatLetterToggle from "../components/btns/RepeatToggle";
 import CheatModeToggle from "../components/btns/CheatToggle";
+import ScoreModal from "../components/ScoreModal";
 import { wordService } from "../services/api/wordService";
 import RevealingText from "../components/RevealingText";
 
@@ -15,7 +16,7 @@ export default function Home() {
 	//--------State to store all submitted entries------
 	const [submissions, setSubmissions] = useState<string[][]>([]);
 
-	// Game config states
+	//-----Game config states------
 	const [wordLength, setWordLength] = useState(5);
 	const [allowRepeats, setAllowRepeats] = useState(false);
 	const [isCheatMode, setIsCheatMode] = useState(false);
@@ -29,7 +30,20 @@ export default function Home() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	// State to control the animation refresh
+	//---State for game completion and score submission-----
+	const [gameStartTime, setGameStartTime] = useState<number>(Date.now());
+	const [gameWon, setGameWon] = useState(false);
+	const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+	const [gameStats, setGameStats] = useState({
+		guesses: 0,
+		wordLength: 5,
+		allowRepeats: false,
+		timeTaken: 0,
+		targetWord: "",
+	});
+	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+	//---animation refresh---
 	const [animationKey, setAnimationKey] = useState(0);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,11 +55,24 @@ export default function Home() {
 		setWords(characters);
 	}, [typedValue]);
 
-	// Start a new game
+	//-------Clear success message with some delay-------
+	useEffect(() => {
+		if (successMessage) {
+			const timer = setTimeout(() => {
+				setSuccessMessage(null);
+			}, 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [successMessage]);
+
+	//----------------------Start a new game------------------------------
 	const startNewGame = async () => {
 		setIsSubmitting(true);
 		setError(null);
-		setAnimationKey((prev) => prev + 1); // Trigger animation to restart
+		setAnimationKey((prev) => prev + 1);
+		setGameWon(false);
+		setSuccessMessage(null);
+
 		try {
 			const response = await wordService.startGame({
 				wordLength,
@@ -53,7 +80,8 @@ export default function Home() {
 			});
 
 			setGameId(response.gameId);
-			// In cheat mode, we'll get the target word back
+			setGameStartTime(Date.now());
+
 			if (isCheatMode && response.targetWord) {
 				setTargetWord(response.targetWord);
 				console.log("Cheat mode ON - Target word:", response.targetWord);
@@ -61,7 +89,6 @@ export default function Home() {
 				setTargetWord(null);
 			}
 
-			// Reset game state
 			setSubmissions([]);
 			setCorrectWordsCollection([]);
 			setTypedValue("");
@@ -73,10 +100,13 @@ export default function Home() {
 		}
 	};
 
-	// Initialize game on first load
 	useEffect(() => {
 		startNewGame();
 	}, []);
+
+	const checkIfWon = (result: Array<{ letter: string; result: string }>) => {
+		return result.every((item) => item.result === "correct");
+	};
 
 	//-------onSubmit do this-------
 	const handleSubmit = async () => {
@@ -104,7 +134,25 @@ export default function Home() {
 				setSubmissions([...submissions, newSubmission]);
 				setTypedValue("");
 
-				setCorrectWordsCollection([...correctWordsCollection, response.result]);
+				const updatedCollections = [...correctWordsCollection, response.result];
+				setCorrectWordsCollection(updatedCollections);
+
+				// Check if the player has won
+				const hasWon = checkIfWon(response.result);
+				if (hasWon) {
+					const gameEndTime = Date.now();
+					const gameDuration = gameEndTime - gameStartTime;
+
+					setGameWon(true);
+					setGameStats({
+						guesses: updatedCollections.length,
+						wordLength: wordLength,
+						allowRepeats: allowRepeats,
+						timeTaken: gameDuration,
+						targetWord: guess,
+					});
+					setIsScoreModalOpen(true);
+				}
 			} catch (err: any) {
 				let errorMessage = "Failed to check your guess. Please try again.";
 				if (err.response && err.response.data && err.response.data.error) {
@@ -150,6 +198,39 @@ export default function Home() {
 		startNewGame();
 	};
 
+	const handleScoreSubmit = async (playerName: string) => {
+		try {
+			setIsSubmitting(true);
+			await wordService.submitScore({
+				playerName,
+				targetWord: gameStats.targetWord,
+				guesses: gameStats.guesses,
+				duration: gameStats.timeTaken,
+				wordLength: gameStats.wordLength,
+				uniqueLettersOnly: !gameStats.allowRepeats,
+				gameId: gameId || undefined,
+			});
+
+			setSuccessMessage(`Score saved successfully for ${playerName}!`);
+			setIsScoreModalOpen(false);
+			// Start a new game after submission
+			setTimeout(() => {
+				startNewGame();
+			}, 1000);
+		} catch (err) {
+			setError("Failed to save your score. Please try again.");
+			console.error("Error saving score:", err);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	const handleCloseScoreModal = () => {
+		setIsScoreModalOpen(false);
+		// Start a new game after closing without saving
+		startNewGame();
+	};
+
 	//-----------------------------Root-----------------------------------------
 	return (
 		<div className="h-screen flex items-center justify-center">
@@ -188,6 +269,13 @@ export default function Home() {
 						/>
 					</div>
 				)}
+
+				{successMessage && (
+					<div className="bg-green-600 text-white text-center p-2 rounded-lg mb-2">
+						{successMessage}
+					</div>
+				)}
+
 				<div className="bg-neutral-700 rounded-3xl">
 					<div className="flex justify-center">
 						{words.map((char, index) => (
@@ -236,6 +324,14 @@ export default function Home() {
 					</div>
 				</div>
 			</div>
+
+			{/* Score submission modal */}
+			<ScoreModal
+				isOpen={isScoreModalOpen}
+				onClose={handleCloseScoreModal}
+				onSubmit={handleScoreSubmit}
+				gameStats={gameStats}
+			/>
 		</div>
 	);
 }

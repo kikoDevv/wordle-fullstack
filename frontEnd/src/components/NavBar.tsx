@@ -32,49 +32,49 @@ export default function NavBar() {
 		<div>
 			{!hideSlideBtn && (
 				<button
-				onClick={toggleSidebar}
-				className="fixed z-10 text-white cursor-pointer mt-5 ml-5"
-				aria-label="Toggle sidebar"
-			>
-				{isOpen ? (
-					<svg
-						width="32"
-						height="32"
-						fill="currentColor"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
-				) : (
-					<svg
-						width="32"
-						height="32"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M2.75 6C2.75 4.20508 4.20508 2.75 6 2.75H18C19.7949 2.75 21.25 4.20508 21.25 6V18C21.25 19.7949 19.7949 21.25 18 21.25H6C4.20508 21.25 2.75 19.7949 2.75 18V6Z"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-						<path
-							d="M8.75 21.25V2.75"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</svg>
-				)}
-			</button>
+					onClick={toggleSidebar}
+					className="fixed z-10 text-white cursor-pointer mt-5 ml-5"
+					aria-label="Toggle sidebar"
+				>
+					{isOpen ? (
+						<svg
+							width="32"
+							height="32"
+							fill="currentColor"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					) : (
+						<svg
+							width="32"
+							height="32"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M2.75 6C2.75 4.20508 4.20508 2.75 6 2.75H18C19.7949 2.75 21.25 4.20508 21.25 6V18C21.25 19.7949 19.7949 21.25 18 21.25H6C4.20508 21.25 2.75 19.7949 2.75 18V6Z"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+							<path
+								d="M8.75 21.25V2.75"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+						</svg>
+					)}
+				</button>
 			)}
 			{isOpen && (
 				<div
@@ -159,6 +159,28 @@ export default function NavBar() {
 									/>
 								</svg>
 								Play
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="Scores"
+								onClick={toggleSidebar}
+								className="flex items-center px-6 py-3 hover:bg-gray-800 transition-colors duration-200 rounded-lg mx-2"
+							>
+								<svg
+									className="w-5 h-5 mr-3"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="2"
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									/>
+								</svg>
+								Scores
 							</Link>
 						</li>
 						<li>

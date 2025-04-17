@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const { loadWords, getRandomWord, checkGuess } = require("./utils/wordUtils");
+const scoreRoutes = require("./routes/scoreRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5080;
@@ -12,6 +13,9 @@ const gameSessions = new Map();
 
 //--generate randome id--
 const generateGameId = () => Math.random().toString(36).substring(2, 15);
+
+// Register score routes
+app.use("/api/scores", scoreRoutes);
 
 app.get("/api/words/random", async (req, res) => {
 	try {
@@ -53,8 +57,7 @@ app.post("/api/words/check", async (req, res) => {
 		if (targetWord) {
 			wordToCheck = targetWord;
 			console.log(`Using provided target word: "${targetWord}"`);
-		}
-		else if (gameId && gameSessions.has(gameId)) {
+		} else if (gameId && gameSessions.has(gameId)) {
 			const session = gameSessions.get(gameId);
 			wordToCheck = session.targetWord;
 			console.log(
@@ -66,8 +69,7 @@ app.post("/api/words/check", async (req, res) => {
 					`Warning: Target word length ${wordToCheck.length} doesn't match settings ${session.settings.wordLength}`
 				);
 			}
-		}
-		else {
+		} else {
 			console.log(
 				`No gameId or targetWord provided, generating random word of length ${guessLength}`
 			);

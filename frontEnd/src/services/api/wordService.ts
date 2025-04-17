@@ -13,6 +13,16 @@ interface GameConfig {
 	allowRepeats: boolean;
 }
 
+interface ScoreData {
+	playerName: string;
+	targetWord: string;
+	guesses: number;
+	duration: number; // time in milliseconds
+	wordLength: number;
+	uniqueLettersOnly: boolean;
+	gameId?: string;
+}
+
 export const wordService = {
 	//-----Get a random word from the backend based on settings----
 	getRandomWord: async (
@@ -58,6 +68,33 @@ export const wordService = {
 			return response.data;
 		} catch (error) {
 			console.error("Error starting game:", error);
+			throw error;
+		}
+	},
+
+	//---Submit score after winning a game---
+	submitScore: async (scoreData: ScoreData): Promise<{ id: string }> => {
+		try {
+			const response = await axios.post("/api/scores", scoreData);
+			return response.data;
+		} catch (error) {
+			console.error("Error submitting score:", error);
+			throw error;
+		}
+	},
+
+	//---Get highscores with optional filtering---
+	getHighscores: async (filters?: {
+		wordLength?: number;
+		uniqueLettersOnly?: boolean;
+		sortBy?: "time" | "guesses" | "date";
+		order?: "asc" | "desc";
+	}) => {
+		try {
+			const response = await axios.get("/api/scores", { params: filters });
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching highscores:", error);
 			throw error;
 		}
 	},
