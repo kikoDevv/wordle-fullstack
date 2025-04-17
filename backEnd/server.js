@@ -2,9 +2,14 @@ const express = require("express");
 const path = require("path");
 const { loadWords, getRandomWord, checkGuess } = require("./utils/wordUtils");
 const scoreRoutes = require("./routes/scoreRoutes");
+const connectDB = require("./config/db");
+require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5080;
+
+//----Connect to MongoDB---------
+connectDB();
 
 app.use(express.json());
 

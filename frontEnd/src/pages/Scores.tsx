@@ -3,6 +3,7 @@ import { wordService } from "../services/api/wordService";
 
 interface Score {
 	id: string;
+	_id?: string; // Add MongoDB _id field
 	playerName: string;
 	targetWord: string;
 	guesses: number;
@@ -179,9 +180,9 @@ const Scores: React.FC = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{scores.map((score) => (
+							{scores.map((score, index) => (
 								<tr
-									key={score.id}
+									key={score._id || score.id || `score-${index}`}
 									className="border-t border-neutral-600 hover:bg-neutral-600"
 								>
 									<td className="p-3">{score.playerName}</td>

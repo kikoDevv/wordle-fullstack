@@ -1,5 +1,4 @@
 /**
- * Applies filtering and sorting to an array of scores
  * @param {Array} scores - Array of score objects
  * @param {Object} filters - Filter criteria
  * @param {number} [filters.wordLength] - Filter by word length
@@ -11,16 +10,13 @@
 const applyFilters = (scores, filters) => {
 	let filteredScores = [...scores];
 
-	// Apply wordLength filter
 	if (filters.wordLength !== undefined) {
 		filteredScores = filteredScores.filter(
 			(score) => score.wordLength === parseInt(filters.wordLength, 10)
 		);
 	}
 
-	// Apply uniqueLettersOnly filter
 	if (filters.uniqueLettersOnly !== undefined) {
-		// Convert string to boolean if needed
 		const uniqueLettersValue =
 			typeof filters.uniqueLettersOnly === "string"
 				? filters.uniqueLettersOnly === "true"
@@ -31,7 +27,7 @@ const applyFilters = (scores, filters) => {
 		);
 	}
 
-	// Apply sorting
+	//--Apply sorting---
 	const sortBy = filters.sortBy || "time";
 	const order = filters.order || "asc";
 
