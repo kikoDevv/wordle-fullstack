@@ -62,7 +62,7 @@ export default function NavBar() {
 						>
 							<path
 								d="M2.75 6C2.75 4.20508 4.20508 2.75 6 2.75H18C19.7949 2.75 21.25 4.20508 21.25 6V18C21.25 19.7949 19.7949 21.25 18 21.25H6C4.20508 21.25 2.75 19.7949 2.75 18V6Z"
-								strokeWidth="1.5"
+								strokeWidth="1"
 								strokeLinecap="round"
 								strokeLinejoin="round"
 							/>
