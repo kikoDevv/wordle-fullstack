@@ -7,8 +7,6 @@ import CheatModeToggle from "../components/btns/CheatToggle";
 import { wordService } from "../services/api/wordService";
 import RevealingText from "../components/RevealingText";
 
-import Revv from "../components/Revv";
-
 export default function Home() {
 	//-------State for the current input value------
 	const [typedValue, setTypedValue] = useState("");
@@ -24,9 +22,14 @@ export default function Home() {
 	const [gameId, setGameId] = useState<string | null>(null);
 	const [targetWord, setTargetWord] = useState<string | null>(null);
 
-	const [correctWordsCollection, setCorrectWordsCollection] = useState<any[]>(
-		[]
-	);
+	const [correctWordsCollection, setCorrectWordsCollection] = useState<
+		Array<
+			Array<{
+				letter: string;
+				result: string;
+			}>
+		>
+	>([]);
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -226,7 +229,7 @@ export default function Home() {
 
 				const response = await wordService.checkGuess(
 					guess,
-					isCheatMode ? targetWord : undefined,
+					isCheatMode ? targetWord || undefined : undefined,
 					gameId || undefined
 				);
 
@@ -360,20 +363,25 @@ export default function Home() {
 						<div className="grid bg-neutral-700 rounded-3xl mb-1 flex-wrap py-4">
 							{correctWordsCollection.map((wordFeedback, subIndex) => (
 								<div key={subIndex} className="flex justify-center my-0.5">
-									{wordFeedback.map((charInfo, charIndex) => (
-										<h1
-											key={`sub-${subIndex}-char-${charIndex}`}
-											className={`font-extrabold px-4 py-2 mx-0.5 rounded-xl ${
-												charInfo.result === "correct"
-													? "bg-green-500"
-													: charInfo.result === "misplaced"
-													? "bg-amber-300"
-													: "bg-red-400"
-											}`}
-										>
-											{charInfo.letter}
-										</h1>
-									))}
+									{wordFeedback.map(
+										(
+											charInfo: { letter: string; result: string },
+											charIndex: number
+										) => (
+											<h1
+												key={`sub-${subIndex}-char-${charIndex}`}
+												className={`font-extrabold px-4 py-2 mx-0.5 rounded-xl ${
+													charInfo.result === "correct"
+														? "bg-green-500"
+														: charInfo.result === "misplaced"
+														? "bg-amber-300"
+														: "bg-red-400"
+												}`}
+											>
+												{charInfo.letter}
+											</h1>
+										)
+									)}
 								</div>
 							))}
 						</div>

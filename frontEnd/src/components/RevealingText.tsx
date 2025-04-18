@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface RevealingTextProps {
 	text: string;
@@ -120,27 +120,24 @@ const RevealingText: React.FC<RevealingTextProps> = ({
 					transition: !isRevealing ? "width 0.2s ease" : "width 0.1s ease",
 				}}
 			>
-				{text.split("").map((char, index) => {
-					const isVisible = isRevealing
-						? index < visibleChars
-						: index < visibleChars;
-
-					return (
-						<span
-							key={index}
-							ref={(el) => (letterRefs.current[index] = el)}
-							className={`inline-block transition-opacity ${textColor}`}
-							style={{
-								whiteSpace: "pre",
-								display: "inline-block",
-								width: char === " " ? "0.25em" : undefined,
-								marginRight: char === " " ? "0.25em" : undefined,
-							}}
-						>
-							{char}
-						</span>
-					);
-				})}
+				{text.split("").map((char, index) => (
+					<span
+						key={index}
+						ref={(el) => {
+							letterRefs.current[index] = el;
+							return null;
+						}}
+						className={`inline-block transition-opacity ${textColor}`}
+						style={{
+							whiteSpace: "pre",
+							display: "inline-block",
+							width: char === " " ? "0.25em" : undefined,
+							marginRight: char === " " ? "0.25em" : undefined,
+						}}
+					>
+						{char}
+					</span>
+				))}
 			</div>
 
 			<div
