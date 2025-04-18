@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 export default function About() {
 	return (
 		<div className="h-screen flex items-center justify-center">
-			<div className="w-dvh px-4">
-				<div className="bg-neutral-700 rounded-3xl mb-6 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-neutral-700">
+			<div className="px-4">
+				<div className="bg-neutral-700 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-neutral-700">
 					<div className="bg-neutral-800 p-6 text-center">
 						<h1 className="text-3xl font-bold mb-2">About Wordle</h1>
 						<p className="text-neutral-400">
