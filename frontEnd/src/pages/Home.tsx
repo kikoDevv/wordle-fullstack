@@ -4,7 +4,6 @@ import SlideSelector from "../components/btns/SlideSelector";
 import SubmitButton from "../components/btns/SubmitButton";
 import RepeatLetterToggle from "../components/btns/RepeatToggle";
 import CheatModeToggle from "../components/btns/CheatToggle";
-import ScoreModal from "../components/ScoreModal";
 import { wordService } from "../services/api/wordService";
 import RevealingText from "../components/RevealingText";
 
@@ -35,7 +34,9 @@ export default function Home() {
 	//---State for game completion and score submission-----
 	const [gameStartTime, setGameStartTime] = useState<number>(Date.now());
 	const [gameWon, setGameWon] = useState(false);
-	const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+	const [showScoreSection, setShowScoreSection] = useState(false);
+	const [nameInputMode, setNameInputMode] = useState(false);
+	const [nameInputError, setNameInputError] = useState<string | null>(null);
 	const [gameStats, setGameStats] = useState({
 		guesses: 0,
 		wordLength: 5,
@@ -48,23 +49,30 @@ export default function Home() {
 	//---animation refresh keys---
 	const [messageAnimationKey, setMessageAnimationKey] = useState(0);
 	const [messageType, setMessageType] = useState<
-		"welcome" | "error" | "success"
+		"welcome" | "error" | "success" | "congrats"
 	>("welcome");
 	const [messageText, setMessageText] = useState(
 		"May fortune smile upon you !"
 	);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		// Limit input to current wordLength by taking only the first N characters
 		const input = e.target.value;
-		const limitedInput = input.slice(0, wordLength);
-		setTypedValue(limitedInput);
+
+		if (nameInputMode) {
+			setTypedValue(input);
+			if (nameInputError) setNameInputError(null);
+		} else {
+			const limitedInput = input.slice(0, wordLength);
+			setTypedValue(limitedInput);
+		}
 	};
 
 	useEffect(() => {
-		const characters = typedValue.split("").filter((char) => char !== " ");
-		setWords(characters);
-	}, [typedValue]);
+		if (!nameInputMode) {
+			const characters = typedValue.split("").filter((char) => char !== " ");
+			setWords(characters);
+		}
+	}, [typedValue, nameInputMode]);
 
 	//-------Clear success message with some delay-------
 	useEffect(() => {
@@ -78,14 +86,23 @@ export default function Home() {
 
 	//-------Message animation completion handler-------
 	const handleMessageAnimationComplete = () => {
-		// Only clear error and success messages, keep welcome message
 		if (messageType !== "welcome") {
+			const delay = messageType === "congrats" ? 1500 : 300;
+
 			setTimeout(() => {
 				setMessageText("good luck!1 (: ");
 				setMessageType("welcome");
 				setMessageAnimationKey((prev) => prev + 1);
-			}, 300);
+			}, delay);
 		}
+	};
+
+	// Format time for display
+	const formatTime = (ms: number): string => {
+		const seconds = Math.floor(ms / 1000);
+		const minutes = Math.floor(seconds / 60);
+		const remainingSeconds = seconds % 60;
+		return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 	};
 
 	//----------------------Start a new game------------------------------
@@ -93,6 +110,9 @@ export default function Home() {
 		setIsSubmitting(true);
 		setError(null);
 		setSuccessMessage(null);
+		setShowScoreSection(false);
+		setNameInputMode(false);
+		setNameInputError(null);
 
 		// Show welcome message
 		setMessageText("May fortune smile upon you! ");
@@ -142,6 +162,50 @@ export default function Home() {
 
 	//-------onSubmit do this-------
 	const handleSubmit = async () => {
+		if (nameInputMode) {
+			// Handle score submission when in name input mode
+			if (!typedValue.trim()) {
+				setNameInputError("Please enter your name");
+				return;
+			}
+
+			try {
+				setIsSubmitting(true);
+				await wordService.submitScore({
+					playerName: typedValue.trim(),
+					targetWord: gameStats.targetWord,
+					guesses: gameStats.guesses,
+					duration: gameStats.timeTaken,
+					wordLength: gameStats.wordLength,
+					uniqueLettersOnly: !gameStats.allowRepeats,
+					gameId: gameId || undefined,
+				});
+
+				const successMsg = `Score saved successfully for ${typedValue.trim()}!`;
+				setSuccessMessage(successMsg);
+				setMessageText(successMsg);
+				setMessageType("success");
+				setMessageAnimationKey((prev) => prev + 1);
+
+				setShowScoreSection(false);
+				setNameInputMode(false);
+				// Start a new game after submission
+				setTimeout(() => {
+					startNewGame();
+				}, 3000);
+			} catch (err) {
+				const errorMsg = "Failed to save your score. Please try again.";
+				setError(errorMsg);
+				setMessageText(errorMsg);
+				setMessageType("error");
+				setMessageAnimationKey((prev) => prev + 1);
+				console.error("Error saving score:", err);
+			} finally {
+				setIsSubmitting(false);
+			}
+			return;
+		}
+
 		if (words.length > 0) {
 			setIsSubmitting(true);
 			setError(null);
@@ -173,7 +237,6 @@ export default function Home() {
 				const updatedCollections = [...correctWordsCollection, response.result];
 				setCorrectWordsCollection(updatedCollections);
 
-				// Check if the player has won
 				const hasWon = checkIfWon(response.result);
 				if (hasWon) {
 					const gameEndTime = Date.now();
@@ -187,7 +250,14 @@ export default function Home() {
 						timeTaken: gameDuration,
 						targetWord: guess,
 					});
-					setIsScoreModalOpen(true);
+
+					setMessageText(`Congratulations! You guessed the word-->${guess}<--`);
+					setMessageType("congrats");
+					setMessageAnimationKey((prev) => prev + 1);
+
+					setShowScoreSection(true);
+					setNameInputMode(true);
+					setTypedValue("");
 				}
 			} catch (err: any) {
 				let errorMessage = "Failed to check your guess. Please try again.";
@@ -217,8 +287,10 @@ export default function Home() {
 
 	//----key press for enter or return-------
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" && !isSubmitting && words.length > 0) {
-			handleSubmit();
+		if (e.key === "Enter" && !isSubmitting) {
+			if (nameInputMode || words.length > 0) {
+				handleSubmit();
+			}
 		}
 	};
 
@@ -237,45 +309,10 @@ export default function Home() {
 		startNewGame();
 	};
 
-	const handleScoreSubmit = async (playerName: string) => {
-		try {
-			setIsSubmitting(true);
-			await wordService.submitScore({
-				playerName,
-				targetWord: gameStats.targetWord,
-				guesses: gameStats.guesses,
-				duration: gameStats.timeTaken,
-				wordLength: gameStats.wordLength,
-				uniqueLettersOnly: !gameStats.allowRepeats,
-				gameId: gameId || undefined,
-			});
-
-			const successMsg = `Score saved successfully for ${playerName}!`;
-			setSuccessMessage(successMsg);
-			setMessageText(successMsg);
-			setMessageType("success");
-			setMessageAnimationKey((prev) => prev + 1);
-
-			setIsScoreModalOpen(false);
-			// Start a new game after submission
-			setTimeout(() => {
-				startNewGame();
-			}, 3000);
-		} catch (err) {
-			const errorMsg = "Failed to save your score. Please try again.";
-			setError(errorMsg);
-			setMessageText(errorMsg);
-			setMessageType("error");
-			setMessageAnimationKey((prev) => prev + 1);
-			console.error("Error saving score:", err);
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
-	const handleCloseScoreModal = () => {
-		setIsScoreModalOpen(false);
-		// Start a new game after closing without saving
+	const skipScoreSubmission = () => {
+		setShowScoreSection(false);
+		setNameInputMode(false);
+		// Start a new game
 		startNewGame();
 	};
 
@@ -291,11 +328,17 @@ export default function Home() {
 							text={messageText}
 							className={`font-medium text-xl ${
 								messageType === "welcome" ? "font-extrabold text-2xl pr-15" : ""
-							} ${messageType === "error" ? "pr-15" : ""}`}
+							} ${messageType === "error" ? "pr-15" : ""} ${
+								messageType === "congrats"
+									? "font-extrabold text-2xl pr-15"
+									: ""
+							}`}
 							dotColor={
 								messageType === "error"
 									? "bg-red-500"
 									: messageType === "success"
+									? "bg-green-500"
+									: messageType === "congrats"
 									? "bg-green-500"
 									: "bg-white"
 							}
@@ -304,11 +347,14 @@ export default function Home() {
 									? "text-red-400"
 									: messageType === "success"
 									? "text-green-400"
+									: messageType === "congrats"
+									? "text-green-400"
 									: "text-white"
 							}
 							onComplete={handleMessageAnimationComplete}
 						/>
 					</div>
+
 					{/*------------------lower section----------------*/}
 					{submissions.length > 0 && (
 						<div className="grid bg-neutral-700 rounded-3xl mb-1 flex-wrap py-4">
@@ -336,24 +382,32 @@ export default function Home() {
 					{/*------------------Lower section--------------------*/}
 					<div className="bg-neutral-700 rounded-3xl">
 						<div className="flex justify-center">
-							{words.map((char, index) => (
-								<h1
-									key={index}
-									className="font-medium text-3xl text-center flex items-center justify-center min-h-12 mx-0.5 min-w-12 bg-neutral-600 rounded-xl mt-1.5"
-								>
-									{char}
-								</h1>
-							))}
+							{!nameInputMode &&
+								words.map((char, index) => (
+									<h1
+										key={index}
+										className="font-medium text-3xl text-center flex items-center justify-center min-h-12 mx-0.5 min-w-12 bg-neutral-600 rounded-xl mt-1.5"
+									>
+										{char}
+									</h1>
+								))}
 						</div>
 						<div className="w-full">
 							<input
 								type="input"
-								placeholder="Type the words here or make any changes before starting the game"
+								placeholder={
+									nameInputMode
+										? "Enter your name to save your score"
+										: "Type the words here or make any changes before starting the game"
+								}
 								className="w-full p-4 border-none outline-none"
 								value={typedValue}
 								onChange={handleInputChange}
 								onKeyDown={handleKeyPress}
 							/>
+							{nameInputError && nameInputMode && (
+								<p className="text-red-500 p-2 text-center">{nameInputError}</p>
+							)}
 						</div>
 						{/* //-------------buttons------------------ */}
 						<div className="flex px-2 py-2">
@@ -361,7 +415,6 @@ export default function Home() {
 								onChange={handleRepeatsChange}
 								defaultActive={allowRepeats}
 							/>
-
 							<CheatModeToggle
 								onChange={handleCheatModeChange}
 								defaultActive={isCheatMode}
@@ -370,7 +423,6 @@ export default function Home() {
 								onLengthChange={handleLengthChange}
 								defaultLength={wordLength}
 							/>
-
 							<Button text="New game" onClick={startNewGame} />
 							<SubmitButton
 								onClick={handleSubmit}
@@ -381,14 +433,6 @@ export default function Home() {
 						</div>
 					</div>
 				</div>
-
-				{/* Score submission modal */}
-				<ScoreModal
-					isOpen={isScoreModalOpen}
-					onClose={handleCloseScoreModal}
-					onSubmit={handleScoreSubmit}
-					gameStats={gameStats}
-				/>
 			</div>
 
 			<div className="py-4">
