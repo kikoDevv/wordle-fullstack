@@ -6,6 +6,9 @@ interface RevealingTextProps {
 	dotColor?: string;
 	textColor?: string;
 	onComplete?: () => void;
+	showTimer?: boolean;
+	timerStartTime?: number;
+	stopTimer?: boolean;
 }
 
 const RevealingText: React.FC<RevealingTextProps> = ({
@@ -14,6 +17,9 @@ const RevealingText: React.FC<RevealingTextProps> = ({
 	dotColor = "bg-white",
 	textColor = "text-white",
 	onComplete,
+	showTimer = false,
+	timerStartTime,
+	stopTimer = false,
 }) => {
 	const [dotPosition, setDotPosition] = useState(-10);
 	const [visibleChars, setVisibleChars] = useState(0);
@@ -23,6 +29,56 @@ const RevealingText: React.FC<RevealingTextProps> = ({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 	const letterCenters = useRef<number[]>([]);
+
+	// Timer state
+	const [elapsedTime, setElapsedTime] = useState(0);
+	const timerRef = useRef<number | null>(null);
+	const [frozenTime, setFrozenTime] = useState<number | null>(null);
+
+	// Format timer
+	const formatTime = (ms: number): string => {
+		const seconds = Math.floor(ms / 1000);
+		const minutes = Math.floor(seconds / 60);
+		const remainingSeconds = seconds % 60;
+		return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+	};
+
+	useEffect(() => {
+		if (stopTimer && showTimer && !frozenTime && elapsedTime > 0) {
+			setFrozenTime(elapsedTime);
+
+			if (timerRef.current !== null) {
+				clearInterval(timerRef.current);
+				timerRef.current = null;
+			}
+		}
+	}, [stopTimer, showTimer, elapsedTime, frozenTime]);
+
+	useEffect(() => {
+		if (showTimer && timerStartTime && !stopTimer && !frozenTime) {
+			const updateTimer = () => {
+				const now = Date.now();
+				const elapsed = now - timerStartTime;
+				setElapsedTime(elapsed);
+			};
+
+			updateTimer();
+
+			timerRef.current = window.setInterval(updateTimer, 1000);
+
+			return () => {
+				if (timerRef.current !== null) {
+					clearInterval(timerRef.current);
+				}
+			};
+		}
+	}, [showTimer, timerStartTime, stopTimer, frozenTime]);
+
+	useEffect(() => {
+		if (!showTimer || !timerStartTime) {
+			setFrozenTime(null);
+		}
+	}, [showTimer, timerStartTime]);
 
 	useEffect(() => {
 		if (!text) return;
@@ -143,17 +199,23 @@ const RevealingText: React.FC<RevealingTextProps> = ({
 			<div
 				className={`absolute top-1/2 rounded-full transition-all ${
 					dotColor || "bg-white"
-				}`}
+				} flex items-center justify-center`}
 				style={{
 					left: `${dotPosition}px`,
-					width: "1.5rem",
-					height: "1.5rem",
+					width:  "1.5rem",
+					height:  "1.5rem",
 					transform: `translateY(-60%) scale(1)`,
 					boxShadow: "0 0 10px 2px black",
 					transition: animationComplete ? "left 0.2s ease" : "none",
 					zIndex: 1,
 				}}
-			/>
+			>
+				{showTimer && timerStartTime && (
+					<span className="text-black text-[10px] font-bold">
+						{formatTime(frozenTime !== null ? frozenTime : elapsedTime)}
+					</span>
+				)}
+			</div>
 		</div>
 	);
 };

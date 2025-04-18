@@ -22,6 +22,10 @@ export default function Home() {
 	const [gameId, setGameId] = useState<string | null>(null);
 	const [targetWord, setTargetWord] = useState<string | null>(null);
 
+	// Timer states
+	const [timerStartTime, setTimerStartTime] = useState<number | null>(null);
+	const [showTimer, setShowTimer] = useState(false);
+
 	const [correctWordsCollection, setCorrectWordsCollection] = useState<
 		Array<
 			Array<{
@@ -89,7 +93,6 @@ export default function Home() {
 
 	//-------Message animation completion handler-------
 	const handleMessageAnimationComplete = () => {
-		
 		if (messageType === "congrats") {
 			setTimeout(() => {
 				setMessageText("Enter your name to save your score! ");
@@ -111,6 +114,10 @@ export default function Home() {
 		setShowScoreSection(false);
 		setNameInputMode(false);
 		setNameInputError(null);
+
+		// Reset timer states
+		setTimerStartTime(null);
+		setShowTimer(false);
 
 		// Show welcome message
 		setMessageText("May fortune smile upon you! ");
@@ -190,6 +197,9 @@ export default function Home() {
 				setMessageType("success");
 				setMessageAnimationKey((prev) => prev + 1);
 
+				// Hide timer after score submission
+				setShowTimer(false);
+
 				setShowScoreSection(false);
 				setNameInputMode(false);
 				// Start a new game after submission
@@ -227,6 +237,13 @@ export default function Home() {
 					return;
 				}
 
+				// Start timer on first guess submission
+				if (!timerStartTime && submissions.length === 0) {
+					const currentTime = Date.now();
+					setTimerStartTime(currentTime);
+					setShowTimer(true);
+				}
+
 				const response = await wordService.checkGuess(
 					guess,
 					isCheatMode ? targetWord || undefined : undefined,
@@ -243,7 +260,12 @@ export default function Home() {
 				const hasWon = checkIfWon(response.result);
 				if (hasWon) {
 					const gameEndTime = Date.now();
-					const gameDuration = gameEndTime - gameStartTime;
+					const gameDuration = timerStartTime
+						? gameEndTime - timerStartTime
+						: 0;
+
+					// Hide the timer when the user wins
+					setShowTimer(false);
 
 					setGameWon(true);
 					setGameStats({
@@ -392,6 +414,9 @@ export default function Home() {
 									: "text-white"
 							}
 							onComplete={handleMessageAnimationComplete}
+							showTimer={showTimer}
+							timerStartTime={timerStartTime || undefined}
+							stopTimer={gameWon} // Stop timer when the user has won
 						/>
 					</div>
 
