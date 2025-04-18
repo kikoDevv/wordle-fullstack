@@ -37,7 +37,7 @@ const formatTime = (ms) => {
 
 const formatDate = (dateString) => {
 	const date = new Date(dateString);
-	return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+	return date.toLocaleDateString(); // Only show year/month/day
 };
 
 app.locals.formatTime = formatTime;
@@ -243,7 +243,6 @@ app.post("/api/game/start", async (req, res) => {
 	}
 });
 
-// Add health check endpoint for Railway
 app.get("/health", (req, res) => {
 	res.status(200).send("OK");
 });

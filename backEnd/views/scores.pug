@@ -7,10 +7,10 @@ block content
         //- Header section---------
         div(class="bg-neutral-800 p-6 text-center")
           h1.text-3xl.font-bold.mb-2 Leaderboard
-          p.text-neutral-400 See how you rank against other players
+          p.text-neutral-400 This is all the data seved so far in our data base
 
         //------------ Filter section -------
-        div(class="bg-neutral-800 border-t border-neutral-600 p-4")
+        div(class="border-t border-b p-4")
           form(method="get" action="/scores" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4")
             div
               label(class="block mb-1 text-neutral-400 text-sm") Sort by
@@ -51,15 +51,15 @@ block content
                 div(class="col-span-1") #
                 div(class="col-span-2") Player
                 div(class="col-span-1 text-center") Score
-                div(class="col-span-1 text-center") Length
+                div(class="col-span-1 text-center") Duration
                 div(class="col-span-1 text-center") Tries
                 div(class="col-span-2 text-center") Target Word
                 div(class="col-span-1 text-center") Type
-                div(class="col-span-1 text-center") Time
+                div(class="col-span-1 text-center") Type
                 div(class="col-span-2 text-right") Date
 
-              //- Score Rows
-              div(class="divide-y divide-neutral-600")
+              //- Score Rows---
+              div(class="divide-y bg-green-900 rounded-3xl")
                 each score, index in scores
                   - const rank = index + 1
                   div(class="grid grid-cols-12 gap-1 py-3 px-4 items-center hover:bg-neutral-600 transition-colors duration-150")
@@ -74,18 +74,16 @@ block content
                         span(class="text-neutral-400")= rank
 
                     div(class="col-span-2 flex items-center")
-                      - const nameInitial = score.playerName.charAt(0).toUpperCase()
-                      - const colors = ['bg-teal-600', 'bg-cyan-600', 'bg-teal-600', 'bg-cyan-600', 'bg-teal-600']
-                      - const avatarColor = colors[index % colors.length]
-
-                      div(class=`w-8 h-8 rounded-full ${avatarColor} flex items-center justify-center mr-2 font-bold`)= nameInitial
                       span(class="font-medium text-sm")= score.playerName
 
                     div(class="col-span-1 text-center font-bold")
                       = Math.floor(10000 / (score.guesses + score.duration/10)).toLocaleString()
 
+                    div(class="col-span-1 text-center text-xs text-red-500")= formatTime(score.duration)
+
                     div(class="col-span-1 text-center")
                       span(class="bg-neutral-700 px-2 py-1 rounded-md text-xs")= score.wordLength + " ltrs"
+
 
                     div(class="col-span-1 text-center")
                       div(class="flex justify-center gap-px")
@@ -95,13 +93,13 @@ block content
 
                     div(class="col-span-2 font-mono text-center text-xs bg-neutral-700 px-1 py-0.5 rounded")= score.targetWord
 
+
                     div(class="col-span-1 text-center text-xs")
                       if score.uniqueLettersOnly
                         span(class="bg-teal-800 px-1.5 py-0.5 rounded") Unique
                       else
                         span(class="bg-neutral-800 px-1.5 py-0.5 rounded") Repeat
 
-                    div(class="col-span-1 text-center text-xs")= formatTime(score.duration)
 
                     div(class="col-span-2 text-right text-xs text-neutral-400")
                       = formatDate(score.date)
@@ -110,8 +108,9 @@ block content
             div(class="bg-neutral-800 rounded-xl p-8 text-center")
               p(class="text-neutral-400 mb-4") No scores found. Try adjusting your filters or play some games first!
 
-          //- Footer section
+          //- Footer section---
           div(class="mt-6 text-center")
+            p.pb-3 See how you rank against other players
             div(class="flex justify-center gap-4")
-              a(href=`${frontendUrl}/` class="inline-block px-6 py-2 font-medium bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors") Play Game
-              a(href=`${frontendUrl}/about` class="inline-block px-6 py-2 font-medium bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors") About
+              a(href="http://localhost:5173/" class="inline-block px-6 py-2 font-medium bg-gray-800 rounded-2xl") Play Game
+              a(href="http://localhost:5173/about" class="inline-block px-6 py-2 font-medium bg-gray-800 rounded-2xl") About

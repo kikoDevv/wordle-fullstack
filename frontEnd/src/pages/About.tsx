@@ -99,7 +99,7 @@ export default function About() {
 									<div className="bg-neutral-800 p-4 rounded-xl">
 										<h3 className="font-semibold mb-2">Score Tracking</h3>
 										<p className="text-neutral-300">
-											Track your performance and share with friends
+											Track your performance and store in data base
 										</p>
 									</div>
 								</div>
@@ -113,8 +113,8 @@ export default function About() {
 									<Link to="/">
 										<Button text="Start Playing" />
 									</Link>
-									<Link to="/score">
-										<Button text="View Scores" />
+									<Link to="http://localhost:5080/scores">
+										<Button text="Leader board" />
 									</Link>
 								</div>
 							</div>
