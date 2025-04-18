@@ -11,7 +11,10 @@ const PORT = process.env.PORT || 5080;
 
 app.use(
 	cors({
-		origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+		origin:
+			process.env.NODE_ENV === "production"
+				? true
+				: ["http://localhost:5173", "http://127.0.0.1:5173"],
 		credentials: true,
 	})
 );
@@ -21,12 +24,10 @@ app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Serve static frontend files in production
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join(__dirname, "public/app")));
 }
 
-// Utility functions for templates
 const formatTime = (ms) => {
 	const seconds = Math.floor(ms / 1000);
 	const minutes = Math.floor(seconds / 60);
@@ -242,6 +243,11 @@ app.post("/api/game/start", async (req, res) => {
 	}
 });
 
+// Add health check endpoint for Railway
+app.get("/health", (req, res) => {
+	res.status(200).send("OK");
+});
+
 if (process.env.NODE_ENV === "production") {
 	app.get("*", (req, res) => {
 		if (!req.path.startsWith("/api/") && req.path !== "/scores") {
@@ -250,6 +256,6 @@ if (process.env.NODE_ENV === "production") {
 	});
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
 	console.log(`Server running on port ${PORT}`);
 });
