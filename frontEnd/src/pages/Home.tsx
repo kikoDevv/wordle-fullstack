@@ -235,107 +235,117 @@ export default function Home() {
 
 	//-----------------------------Root-----------------------------------------
 	return (
-		<div className="h-screen flex items-center justify-center">
-			<div>
-				{/*---------------Upper section-------------*/}
-				{submissions.length > 0 && (
-					<div className="grid bg-neutral-700 rounded-3xl mb-1  flex-wrap py-4">
-						{correctWordsCollection.map((wordFeedback, subIndex) => (
-							<div key={subIndex} className="flex justify-center my-0.5">
-								{wordFeedback.map((charInfo, charIndex) => (
-									<h1
-										key={`sub-${subIndex}-char-${charIndex}`}
-										className={`font-extrabold px-4 py-2 mx-0.5 rounded-xl ${
-											charInfo.result === "correct"
-												? "bg-green-500"
-												: charInfo.result === "misplaced"
-												? "bg-amber-300"
-												: "bg-red-400"
-										}`}
-									>
-										{charInfo.letter}
-									</h1>
-								))}
-							</div>
-						))}
-					</div>
-				)}
-				{submissions.length == 0 && (
-					<div className="place-self-center mb-2 text-center pr-5">
-						<div className="flex justify-center">
-							<RevealingText
-								key={animationKey}
-								text="May fortune smile upon you! "
-								className="font-extrabold text-2xl"
-								dotColor="bg-amber-300"
+		<div className="h-screen flex flex-col">
+			<div className="flex-grow flex items-center justify-center">
+				<div>
+					{/*---------------Upper section-------------*/}
+					{submissions.length == 0 && (
+						<div className="place-self-center mb-2 text-center pr-15">
+							<div className="flex justify-center">
+								<RevealingText
+									key={animationKey}
+									text="May fortune smile upon you! "
+									className="font-extrabold text-2xl"
+									dotColor="bg-white"
 								/>
+							</div>
+						</div>
+					)}
+					{submissions.length > 0 && (
+						<div className="grid bg-neutral-700 rounded-3xl mb-1  flex-wrap py-4">
+							{correctWordsCollection.map((wordFeedback, subIndex) => (
+								<div key={subIndex} className="flex justify-center my-0.5">
+									{wordFeedback.map((charInfo, charIndex) => (
+										<h1
+											key={`sub-${subIndex}-char-${charIndex}`}
+											className={`font-extrabold px-4 py-2 mx-0.5 rounded-xl ${
+												charInfo.result === "correct"
+													? "bg-green-500"
+													: charInfo.result === "misplaced"
+													? "bg-amber-300"
+													: "bg-red-400"
+											}`}
+										>
+											{charInfo.letter}
+										</h1>
+									))}
+								</div>
+							))}
+						</div>
+					)}
+
+					{/*------------------Lower section--------------------*/}
+					{successMessage && (
+						<div className="bg-green-600 text-white text-center p-2 rounded-lg mb-2">
+							{successMessage}
+						</div>
+					)}
+
+					<div className="bg-neutral-700 rounded-3xl">
+						<div className="flex justify-center">
+							{words.map((char, index) => (
+								<h1
+									key={index}
+									className="font-medium text-3xl text-center flex items-center justify-center min-h-12 mx-0.5 min-w-12 bg-neutral-600 rounded-xl mt-1.5"
+								>
+									{char}
+								</h1>
+							))}
+						</div>
+						<div className="w-full">
+							<input
+								type="input"
+								placeholder="Type the words here or make any changes before starting the game"
+								className="w-full p-4 border-none outline-none"
+								value={typedValue}
+								onChange={handleInputChange}
+								onKeyDown={handleKeyPress}
+							/>
+						</div>
+						{error && (
+							<div className="text-red-500 text-center p-2">{error}</div>
+						)}
+						{/* //-------------buttons------------------ */}
+						<div className="flex px-2 py-2">
+							<RepeatLetterToggle
+								onChange={handleRepeatsChange}
+								defaultActive={allowRepeats}
+							/>
+
+							<CheatModeToggle
+								onChange={handleCheatModeChange}
+								defaultActive={isCheatMode}
+							/>
+							<SlideSelector
+								onLengthChange={handleLengthChange}
+								defaultLength={wordLength}
+							/>
+
+							<Button text="New game" onClick={startNewGame} />
+							<SubmitButton
+								onClick={handleSubmit}
+								disabled={words.length === 0 || isSubmitting}
+								isSubmitting={isSubmitting}
+								className="pl-20"
+							/>
 						</div>
 					</div>
-				)}
-
-				{/*------------------Lower section--------------------*/}
-				{successMessage && (
-					<div className="bg-green-600 text-white text-center p-2 rounded-lg mb-2">
-						{successMessage}
-					</div>
-				)}
-
-				<div className="bg-neutral-700 rounded-3xl">
-					<div className="flex justify-center">
-						{words.map((char, index) => (
-							<h1
-								key={index}
-								className="font-medium text-3xl text-center flex items-center justify-center min-h-12 mx-0.5 min-w-12 bg-neutral-600 rounded-xl mt-1.5"
-							>
-								{char}
-							</h1>
-						))}
-					</div>
-					<div className="w-full">
-						<input
-							type="input"
-							placeholder="Type the words here or make any changes before starting the game"
-							className="w-full p-4 border-none outline-none"
-							value={typedValue}
-							onChange={handleInputChange}
-							onKeyDown={handleKeyPress}
-						/>
-					</div>
-					{error && <div className="text-red-500 text-center p-2">{error}</div>}
-					{/* //-------------buttons------------------ */}
-					<div className="flex px-2 py-2">
-						<RepeatLetterToggle
-							onChange={handleRepeatsChange}
-							defaultActive={allowRepeats}
-						/>
-
-						<CheatModeToggle
-							onChange={handleCheatModeChange}
-							defaultActive={isCheatMode}
-						/>
-						<SlideSelector
-							onLengthChange={handleLengthChange}
-							defaultLength={wordLength}
-						/>
-
-						<Button text="New game" onClick={startNewGame} />
-						<SubmitButton
-							onClick={handleSubmit}
-							disabled={words.length === 0 || isSubmitting}
-							isSubmitting={isSubmitting}
-							className="pl-20"
-						/>
-					</div>
 				</div>
+
+				{/* Score submission modal */}
+				<ScoreModal
+					isOpen={isScoreModalOpen}
+					onClose={handleCloseScoreModal}
+					onSubmit={handleScoreSubmit}
+					gameStats={gameStats}
+				/>
 			</div>
 
-			{/* Score submission modal */}
-			<ScoreModal
-				isOpen={isScoreModalOpen}
-				onClose={handleCloseScoreModal}
-				onSubmit={handleScoreSubmit}
-				gameStats={gameStats}
-			/>
+			<div className="py-4">
+				<p className="text-center text-xs text-gray-500">
+					© 2025 KikoDevv. Inspired by ChatGPT UI. All rights reserved.
+				</p>
+			</div>
 		</div>
 	);
 }
