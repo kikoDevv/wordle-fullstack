@@ -52,7 +52,7 @@ export default function Home() {
 	//---animation refresh keys---
 	const [messageAnimationKey, setMessageAnimationKey] = useState(0);
 	const [messageType, setMessageType] = useState<
-		"welcome" | "error" | "success" | "congrats"
+		"welcome" | "error" | "success" | "congrats" | "cheat"
 	>("welcome");
 	const [messageText, setMessageText] = useState(
 		"May fortune smile upon you !"
@@ -89,24 +89,18 @@ export default function Home() {
 
 	//-------Message animation completion handler-------
 	const handleMessageAnimationComplete = () => {
-		if (messageType !== "welcome") {
+		if (messageType !== "welcome" && messageType !== "cheat") {
 			const delay = messageType === "congrats" ? 1500 : 300;
 
 			setTimeout(() => {
-				setMessageText("good luck!1 (: ");
+				setMessageText("good luck! (:");
 				setMessageType("welcome");
 				setMessageAnimationKey((prev) => prev + 1);
 			}, delay);
 		}
 	};
 
-	// Format time for display
-	const formatTime = (ms: number): string => {
-		const seconds = Math.floor(ms / 1000);
-		const minutes = Math.floor(seconds / 60);
-		const remainingSeconds = seconds % 60;
-		return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-	};
+
 
 	//----------------------Start a new game------------------------------
 	const startNewGame = async () => {
@@ -136,6 +130,12 @@ export default function Home() {
 			if (isCheatMode && response.targetWord) {
 				setTargetWord(response.targetWord);
 				console.log("Cheat mode ON - Target word:", response.targetWord);
+
+				setTimeout(() => {
+					setMessageText(`Psst! The target word is: ${response.targetWord}  `);
+					setMessageType("cheat");
+					setMessageAnimationKey((prev) => prev + 1);
+				}, 800);
 			} else {
 				setTargetWord(null);
 			}
@@ -166,7 +166,6 @@ export default function Home() {
 	//-------onSubmit do this-------
 	const handleSubmit = async () => {
 		if (nameInputMode) {
-			// Handle score submission when in name input mode
 			if (!typedValue.trim()) {
 				setNameInputError("Please enter your name");
 				return;
@@ -195,7 +194,7 @@ export default function Home() {
 				// Start a new game after submission
 				setTimeout(() => {
 					startNewGame();
-				}, 3000);
+				}, 1500);
 			} catch (err) {
 				const errorMsg = "Failed to save your score. Please try again.";
 				setError(errorMsg);
@@ -274,7 +273,7 @@ export default function Home() {
 					errorMessage += " Starting a new game...";
 					setTimeout(() => {
 						startNewGame();
-					}, 2000);
+					}, 1000);
 				}
 
 				setError(errorMessage);
@@ -307,8 +306,41 @@ export default function Home() {
 		startNewGame();
 	};
 
-	const handleCheatModeChange = (enabled: boolean) => {
+	const handleCheatModeChange = async (enabled: boolean) => {
 		setIsCheatMode(enabled);
+
+		if (enabled) {
+			if (targetWord) {
+				setMessageText(`Psst! The target word is: ${targetWord}  `);
+				setMessageType("cheat");
+				setMessageAnimationKey((prev) => prev + 1);
+			}
+
+			else {
+				setIsSubmitting(true);
+				try {
+					const response = await wordService.startGame({
+						wordLength,
+						allowRepeats,
+					});
+
+					if (response.targetWord) {
+						setTargetWord(response.targetWord);
+						setMessageText(`Psst! The target word is: ${response.targetWord}  `);
+						setMessageType("cheat");
+						setMessageAnimationKey((prev) => prev + 1);
+						setGameId(response.gameId);
+					}
+				} catch (err) {
+					console.error("Error fetching target word:", err);
+				} finally {
+					setIsSubmitting(false);
+				}
+
+				return;
+			}
+		}
+
 		startNewGame();
 	};
 
@@ -335,7 +367,7 @@ export default function Home() {
 								messageType === "congrats"
 									? "font-extrabold text-2xl pr-15"
 									: ""
-							}`}
+							} ${messageType === "cheat" ? "font-bold text-xl pr-15" : ""}`}
 							dotColor={
 								messageType === "error"
 									? "bg-red-500"
@@ -343,6 +375,8 @@ export default function Home() {
 									? "bg-green-500"
 									: messageType === "congrats"
 									? "bg-green-500"
+									: messageType === "cheat"
+									? "bg-amber-400"
 									: "bg-white"
 							}
 							textColor={
@@ -352,6 +386,8 @@ export default function Home() {
 									? "text-green-400"
 									: messageType === "congrats"
 									? "text-green-400"
+									: messageType === "cheat"
+									? "text-amber-400"
 									: "text-white"
 							}
 							onComplete={handleMessageAnimationComplete}
@@ -406,7 +442,7 @@ export default function Home() {
 								placeholder={
 									nameInputMode
 										? "Enter your name to save your score"
-										: "Type the words here or make any changes before starting the game"
+										: "Get ready and let's do this"
 								}
 								className="w-full p-4 border-none outline-none"
 								value={typedValue}
