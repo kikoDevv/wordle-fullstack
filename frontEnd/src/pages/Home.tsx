@@ -82,25 +82,26 @@ export default function Home() {
 		if (successMessage) {
 			const timer = setTimeout(() => {
 				setSuccessMessage(null);
-			}, 5000);
+			}, 1000);
 			return () => clearTimeout(timer);
 		}
 	}, [successMessage]);
 
 	//-------Message animation completion handler-------
 	const handleMessageAnimationComplete = () => {
-		if (messageType !== "welcome" && messageType !== "cheat") {
-			const delay = messageType === "congrats" ? 1500 : 300;
-
+		
+		if (messageType === "congrats") {
 			setTimeout(() => {
-				setMessageText("good luck! (:");
-				setMessageType("welcome");
+				setMessageText("Enter your name to save your score! ");
+				setMessageType("success");
 				setMessageAnimationKey((prev) => prev + 1);
-			}, delay);
+
+				// Make sure name input mode is active
+				setNameInputMode(true);
+				setTypedValue("");
+			}, 1500); //-----feel happy for this mutch of secons-----
 		}
 	};
-
-
 
 	//----------------------Start a new game------------------------------
 	const startNewGame = async () => {
@@ -183,7 +184,7 @@ export default function Home() {
 					gameId: gameId || undefined,
 				});
 
-				const successMsg = `Score saved successfully for ${typedValue.trim()}!`;
+				const successMsg = `Score saved successfully for ${typedValue.trim()}!  `;
 				setSuccessMessage(successMsg);
 				setMessageText(successMsg);
 				setMessageType("success");
@@ -194,7 +195,7 @@ export default function Home() {
 				// Start a new game after submission
 				setTimeout(() => {
 					startNewGame();
-				}, 1500);
+				}, 2000);
 			} catch (err) {
 				const errorMsg = "Failed to save your score. Please try again.";
 				setError(errorMsg);
@@ -314,9 +315,7 @@ export default function Home() {
 				setMessageText(`Psst! The target word is: ${targetWord}  `);
 				setMessageType("cheat");
 				setMessageAnimationKey((prev) => prev + 1);
-			}
-
-			else {
+			} else {
 				setIsSubmitting(true);
 				try {
 					const response = await wordService.startGame({
@@ -326,7 +325,9 @@ export default function Home() {
 
 					if (response.targetWord) {
 						setTargetWord(response.targetWord);
-						setMessageText(`Psst! The target word is: ${response.targetWord}  `);
+						setMessageText(
+							`Psst! The target word is: ${response.targetWord}  `
+						);
 						setMessageType("cheat");
 						setMessageAnimationKey((prev) => prev + 1);
 						setGameId(response.gameId);
@@ -441,7 +442,7 @@ export default function Home() {
 								type="input"
 								placeholder={
 									nameInputMode
-										? "Enter your name to save your score"
+										? "Enter your name to save your score  "
 										: "Get ready and let's do this"
 								}
 								className="w-full p-4 border-none outline-none"
