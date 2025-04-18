@@ -9,7 +9,6 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5080;
 
-// Enable CORS for the React frontend
 app.use(
 	cors({
 		origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -21,6 +20,11 @@ app.use(
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+
+// Serve static frontend files in production
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.join(__dirname, "public/app")));
+}
 
 // Utility functions for templates
 const formatTime = (ms) => {
@@ -35,7 +39,6 @@ const formatDate = (dateString) => {
 	return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 };
 
-// Make utility functions available to all templates
 app.locals.formatTime = formatTime;
 app.locals.formatDate = formatDate;
 
@@ -238,6 +241,14 @@ app.post("/api/game/start", async (req, res) => {
 		res.status(500).json({ error: "Failed to start a new game" });
 	}
 });
+
+if (process.env.NODE_ENV === "production") {
+	app.get("*", (req, res) => {
+		if (!req.path.startsWith("/api/") && req.path !== "/scores") {
+			res.sendFile(path.join(__dirname, "public/app/index.html"));
+		}
+	});
+}
 
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);

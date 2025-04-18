@@ -1,0 +1,26 @@
+{
+	"name": "wordle-fullstack",
+	"version": "1.0.0",
+	"description": "Wordle game with React frontend and Express backend",
+	"main": "index.js",
+	"scripts": {
+		"install:backend": "cd backEnd && npm install",
+		"install:frontend": "cd frontEnd && npm install",
+		"postinstall": "npm run install:backend && npm run install:frontend",
+		"build:frontend": "cd frontEnd && npm run build",
+		"start:backend": "cd backEnd && node server.js",
+		"start": "npm run build:frontend && npm run start:backend"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"keywords": [
+		"wordle",
+		"react",
+		"express",
+		"mongodb",
+		"game"
+	],
+	"author": "",
+	"license": "ISC"
+}
