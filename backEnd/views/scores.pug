@@ -1,67 +1,117 @@
 extends layout
 
 block content
-  div.max-w-6xl.mx-auto.p-4
-    h1.text-3xl.font-bold.mb-6 Wordle High Scores
+  div.h-screen.flex.items-center.justify-center
+    div.w-dvh.px-4
+      div(class="bg-neutral-700 rounded-3xl mb-6 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-neutral-700")
+        //- Header section---------
+        div(class="bg-neutral-800 p-6 text-center")
+          h1.text-3xl.font-bold.mb-2 Leaderboard
+          p.text-neutral-400 See how you rank against other players
 
-    div(class="bg-neutral-700 p-4 rounded-lg mb-6")
-      h2(class="text-xl font-semibold mb-3") Filters
-      form(method="get" action="/scores")
-        div(class="grid grid-cols-1 md:grid-cols-4 gap-4")
-          div
-            label(class="block mb-1") Sort by
-            select(name="sortBy" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded")
-              option(value="date" selected=(filter.sortBy === 'date')) Date
-              option(value="guesses" selected=(filter.sortBy === 'guesses')) Guesses
-              option(value="duration" selected=(filter.sortBy === 'duration')) Time
+        //------------ Filter section -------
+        div(class="bg-neutral-800 border-t border-neutral-600 p-4")
+          form(method="get" action="/scores" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4")
+            div
+              label(class="block mb-1 text-neutral-400 text-sm") Sort by
+              select(name="sortBy" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded border border-neutral-500 text-white")
+                option(value="date" selected=(filter.sortBy === 'date')) Date
+                option(value="guesses" selected=(filter.sortBy === 'guesses')) Guesses
+                option(value="duration" selected=(filter.sortBy === 'duration')) Time
 
-          div
-            label(class="block mb-1") Order
-            select(name="order" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded")
-              option(value="desc" selected=(filter.order === 'desc')) ↓ Descending
-              option(value="asc" selected=(filter.order === 'asc')) ↑ Ascending
+            div
+              label(class="block mb-1 text-neutral-400 text-sm") Order
+              select(name="order" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded border border-neutral-500 text-white")
+                option(value="desc" selected=(filter.order === 'desc')) ↓ Descending
+                option(value="asc" selected=(filter.order === 'asc')) ↑ Ascending
 
-          div
-            label(class="block mb-1") Word Length
-            select(name="wordLength" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded")
-              option(value="all" selected=(filter.wordLength === 'all')) All Lengths
-              option(value="4" selected=(filter.wordLength === '4')) 4 Letters
-              option(value="5" selected=(filter.wordLength === '5')) 5 Letters
-              option(value="6" selected=(filter.wordLength === '6')) 6 Letters
-              option(value="7" selected=(filter.wordLength === '7')) 7 Letters
-              option(value="8" selected=(filter.wordLength === '8')) 8 Letters
+            div
+              label(class="block mb-1 text-neutral-400 text-sm") Word Length
+              select(name="wordLength" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded border border-neutral-500 text-white")
+                option(value="all" selected=(filter.wordLength === 'all')) All Lengths
+                option(value="4" selected=(filter.wordLength === '4')) 4 Letters
+                option(value="5" selected=(filter.wordLength === '5')) 5 Letters
+                option(value="6" selected=(filter.wordLength === '6')) 6 Letters
+                option(value="7" selected=(filter.wordLength === '7')) 7 Letters
+                option(value="8" selected=(filter.wordLength === '8')) 8 Letters
 
-          div
-            label(class="block mb-1") Letters
-            select(name="uniqueLettersOnly" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded")
-              option(value="" selected=(filter.uniqueLettersOnly === undefined)) All Games
-              option(value="true" selected=(filter.uniqueLettersOnly === 'true')) Unique Letters Only
-              option(value="false" selected=(filter.uniqueLettersOnly === 'false')) With Repeated Letters
+            div
+              label(class="block mb-1 text-neutral-400 text-sm") Letters
+              select(name="uniqueLettersOnly" onchange="this.form.submit()" class="w-full p-2 bg-neutral-600 rounded border border-neutral-500 text-white")
+                option(value="" selected=(filter.uniqueLettersOnly === undefined)) All Games
+                option(value="true" selected=(filter.uniqueLettersOnly === 'true')) Unique Letters Only
+                option(value="false" selected=(filter.uniqueLettersOnly === 'false')) With Repeated Letters
 
-    //- Scores table --
-    if scores && scores.length > 0
-      div(class="overflow-x-auto")
-        table(class="w-full bg-neutral-700 rounded-lg overflow-hidden")
-          thead
-            tr(class="bg-neutral-600")
-              th(class="p-3 text-left") Player
-              th(class="p-3 text-left") Word
-              th(class="p-3 text-left") Guesses
-              th(class="p-3 text-left") Time
-              th(class="p-3 text-left") Length
-              th(class="p-3 text-left") Settings
-              th(class="p-3 text-left") Date
-          tbody
-            each score in scores
-              tr(class="border-t border-neutral-600 hover:bg-neutral-600")
-                td(class="p-3")= score.playerName
-                td(class="p-3 font-mono")= score.targetWord
-                td(class="p-3")= score.guesses
-                td(class="p-3")= formatTime(score.duration)
-                td(class="p-3")= score.wordLength
-                td(class="p-3")= score.uniqueLettersOnly ? "Unique Letters" : "Repeats Allowed"
-                td(class="p-3")= formatDate(score.date)
-    else
-      div(class="bg-neutral-700 rounded-lg p-6 text-center")
-        p(class="text-xl") No scores found
-        p(class="text-gray-400 mt-2") Try adjusting your filters or play some games first!
+        //-------------Scores Table---------------------
+        div.p-4
+          if scores && scores.length > 0
+            div(class="overflow-hidden rounded-xl")
+              //----Table Headers - Includes all database fields------
+              div(class="grid grid-cols-12 gap-1 bg-neutral-800 py-3 px-4 font-medium text-sm text-neutral-300")
+                div(class="col-span-1") #
+                div(class="col-span-2") Player
+                div(class="col-span-1 text-center") Score
+                div(class="col-span-1 text-center") Length
+                div(class="col-span-1 text-center") Tries
+                div(class="col-span-2 text-center") Target Word
+                div(class="col-span-1 text-center") Type
+                div(class="col-span-1 text-center") Time
+                div(class="col-span-2 text-right") Date
+
+              //- Score Rows
+              div(class="divide-y divide-neutral-600")
+                each score, index in scores
+                  - const rank = index + 1
+                  div(class="grid grid-cols-12 gap-1 py-3 px-4 items-center hover:bg-neutral-600 transition-colors duration-150")
+                    div(class="col-span-1")
+                      if rank === 1
+                        span(class="text-yellow-400 text-xl") 🏆
+                      else if rank === 2
+                        span(class="text-gray-300 text-xl") 🥈
+                      else if rank === 3
+                        span(class="text-amber-600 text-xl") 🥉
+                      else
+                        span(class="text-neutral-400")= rank
+
+                    div(class="col-span-2 flex items-center")
+                      - const nameInitial = score.playerName.charAt(0).toUpperCase()
+                      - const colors = ['bg-teal-600', 'bg-cyan-600', 'bg-teal-600', 'bg-cyan-600', 'bg-teal-600']
+                      - const avatarColor = colors[index % colors.length]
+
+                      div(class=`w-8 h-8 rounded-full ${avatarColor} flex items-center justify-center mr-2 font-bold`)= nameInitial
+                      span(class="font-medium text-sm")= score.playerName
+
+                    div(class="col-span-1 text-center font-bold")
+                      = Math.floor(10000 / (score.guesses + score.duration/10)).toLocaleString()
+
+                    div(class="col-span-1 text-center")
+                      span(class="bg-neutral-700 px-2 py-1 rounded-md text-xs")= score.wordLength + " ltrs"
+
+                    div(class="col-span-1 text-center")
+                      div(class="flex justify-center gap-px")
+                        - for (let i = 0; i < Math.min(score.guesses, 6); i++)
+                          div(class="w-1.5 h-1.5 rounded-full bg-amber-400")
+                      div(class="text-xs text-neutral-400 mt-1")= score.guesses
+
+                    div(class="col-span-2 font-mono text-center text-xs bg-neutral-700 px-1 py-0.5 rounded")= score.targetWord
+
+                    div(class="col-span-1 text-center text-xs")
+                      if score.uniqueLettersOnly
+                        span(class="bg-teal-800 px-1.5 py-0.5 rounded") Unique
+                      else
+                        span(class="bg-neutral-800 px-1.5 py-0.5 rounded") Repeat
+
+                    div(class="col-span-1 text-center text-xs")= formatTime(score.duration)
+
+                    div(class="col-span-2 text-right text-xs text-neutral-400")
+                      = formatDate(score.date)
+          else
+            //- Empty state if no scores
+            div(class="bg-neutral-800 rounded-xl p-8 text-center")
+              p(class="text-neutral-400 mb-4") No scores found. Try adjusting your filters or play some games first!
+
+          //- Footer section
+          div(class="mt-6 text-center")
+            div(class="flex justify-center gap-4")
+              a(href=`${frontendUrl}/` class="inline-block px-6 py-2 font-medium bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors") Play Game
+              a(href=`${frontendUrl}/about` class="inline-block px-6 py-2 font-medium bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors") About
