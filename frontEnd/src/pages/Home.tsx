@@ -45,11 +45,20 @@ export default function Home() {
 	});
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-	//---animation refresh---
-	const [animationKey, setAnimationKey] = useState(0);
+	//---animation refresh keys---
+	const [messageAnimationKey, setMessageAnimationKey] = useState(0);
+	const [messageType, setMessageType] = useState<
+		"welcome" | "error" | "success"
+	>("welcome");
+	const [messageText, setMessageText] = useState(
+		"May fortune smile upon you !"
+	);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTypedValue(e.target.value);
+		// Limit input to current wordLength by taking only the first N characters
+		const input = e.target.value;
+		const limitedInput = input.slice(0, wordLength);
+		setTypedValue(limitedInput);
 	};
 
 	useEffect(() => {
@@ -67,13 +76,30 @@ export default function Home() {
 		}
 	}, [successMessage]);
 
+	//-------Message animation completion handler-------
+	const handleMessageAnimationComplete = () => {
+		// Only clear error and success messages, keep welcome message
+		if (messageType !== "welcome") {
+			setTimeout(() => {
+				setMessageText("good luck!1 (: ");
+				setMessageType("welcome");
+				setMessageAnimationKey((prev) => prev + 1);
+			}, 300);
+		}
+	};
+
 	//----------------------Start a new game------------------------------
 	const startNewGame = async () => {
 		setIsSubmitting(true);
 		setError(null);
-		setAnimationKey((prev) => prev + 1);
-		setGameWon(false);
 		setSuccessMessage(null);
+
+		// Show welcome message
+		setMessageText("May fortune smile upon you! ");
+		setMessageType("welcome");
+		setMessageAnimationKey((prev) => prev + 1);
+
+		setGameWon(false);
 
 		try {
 			const response = await wordService.startGame({
@@ -95,7 +121,11 @@ export default function Home() {
 			setCorrectWordsCollection([]);
 			setTypedValue("");
 		} catch (err) {
-			setError("Failed to start a new game. Please try again.");
+			const errorMsg = "Failed to start a new game. Please try again. ";
+			setError(errorMsg);
+			setMessageText(errorMsg);
+			setMessageType("error");
+			setMessageAnimationKey((prev) => prev + 1);
 			console.error("Error starting new game:", err);
 		} finally {
 			setIsSubmitting(false);
@@ -121,7 +151,11 @@ export default function Home() {
 
 				//--Check if the guess length matches the current word length setting--
 				if (guess.length !== wordLength) {
-					setError(`Your guess must be ${wordLength} letters long.`);
+					const errorMsg = `Your guess must be ${wordLength} letters long!  `;
+					setError(errorMsg);
+					setMessageText(errorMsg);
+					setMessageType("error");
+					setMessageAnimationKey((prev) => prev + 1);
 					setIsSubmitting(false);
 					return;
 				}
@@ -171,6 +205,9 @@ export default function Home() {
 				}
 
 				setError(errorMessage);
+				setMessageText(errorMessage);
+				setMessageType("error");
+				setMessageAnimationKey((prev) => prev + 1);
 				console.error("Error submitting guess:", err);
 			} finally {
 				setIsSubmitting(false);
@@ -213,14 +250,23 @@ export default function Home() {
 				gameId: gameId || undefined,
 			});
 
-			setSuccessMessage(`Score saved successfully for ${playerName}!`);
+			const successMsg = `Score saved successfully for ${playerName}!`;
+			setSuccessMessage(successMsg);
+			setMessageText(successMsg);
+			setMessageType("success");
+			setMessageAnimationKey((prev) => prev + 1);
+
 			setIsScoreModalOpen(false);
 			// Start a new game after submission
 			setTimeout(() => {
 				startNewGame();
-			}, 1000);
+			}, 3000);
 		} catch (err) {
-			setError("Failed to save your score. Please try again.");
+			const errorMsg = "Failed to save your score. Please try again.";
+			setError(errorMsg);
+			setMessageText(errorMsg);
+			setMessageType("error");
+			setMessageAnimationKey((prev) => prev + 1);
 			console.error("Error saving score:", err);
 		} finally {
 			setIsSubmitting(false);
@@ -238,21 +284,34 @@ export default function Home() {
 		<div className="h-screen flex flex-col">
 			<div className="flex-grow flex items-center justify-center">
 				<div>
-					{/*---------------Upper section-------------*/}
-					{submissions.length == 0 && (
-						<div className="place-self-center mb-2 text-center pr-15">
-							<div className="flex justify-center">
-								<RevealingText
-									key={animationKey}
-									text="May fortune smile upon you! "
-									className="font-extrabold text-2xl"
-									dotColor="bg-white"
-								/>
-							</div>
-						</div>
-					)}
+					{/*---------------Upper section with fixed positioning-------------*/}
+					<div className="flex justify-center">
+						<RevealingText
+							key={messageAnimationKey}
+							text={messageText}
+							className={`font-medium text-xl ${
+								messageType === "welcome" ? "font-extrabold text-2xl pr-15" : ""
+							} ${messageType === "error" ? "pr-15" : ""}`}
+							dotColor={
+								messageType === "error"
+									? "bg-red-500"
+									: messageType === "success"
+									? "bg-green-500"
+									: "bg-white"
+							}
+							textColor={
+								messageType === "error"
+									? "text-red-400"
+									: messageType === "success"
+									? "text-green-400"
+									: "text-white"
+							}
+							onComplete={handleMessageAnimationComplete}
+						/>
+					</div>
+					{/*------------------lower section----------------*/}
 					{submissions.length > 0 && (
-						<div className="grid bg-neutral-700 rounded-3xl mb-1  flex-wrap py-4">
+						<div className="grid bg-neutral-700 rounded-3xl mb-1 flex-wrap py-4">
 							{correctWordsCollection.map((wordFeedback, subIndex) => (
 								<div key={subIndex} className="flex justify-center my-0.5">
 									{wordFeedback.map((charInfo, charIndex) => (
@@ -275,12 +334,6 @@ export default function Home() {
 					)}
 
 					{/*------------------Lower section--------------------*/}
-					{successMessage && (
-						<div className="bg-green-600 text-white text-center p-2 rounded-lg mb-2">
-							{successMessage}
-						</div>
-					)}
-
 					<div className="bg-neutral-700 rounded-3xl">
 						<div className="flex justify-center">
 							{words.map((char, index) => (
@@ -302,9 +355,6 @@ export default function Home() {
 								onKeyDown={handleKeyPress}
 							/>
 						</div>
-						{error && (
-							<div className="text-red-500 text-center p-2">{error}</div>
-						)}
 						{/* //-------------buttons------------------ */}
 						<div className="flex px-2 py-2">
 							<RepeatLetterToggle

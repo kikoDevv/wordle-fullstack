@@ -151,7 +151,7 @@ const RevealingText: React.FC<RevealingTextProps> = ({
 					left: `${dotPosition}px`,
 					width: "1.5rem",
 					height: "1.5rem",
-					transform: `translateY(-60%) scale(1)`, // Always keep scale at 1
+					transform: `translateY(-60%) scale(1)`,
 					boxShadow: "0 0 10px 2px black",
 					transition: animationComplete ? "left 0.2s ease" : "none",
 					zIndex: 1,
