@@ -1,47 +1,68 @@
-#🚀 WordleGPT: ChatGPT‑Style Wordle
+## 🚀 WordleGPT: ChatGPT‑Style Wordle
 
 A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. Built from a mix of custom and prebuilt React components, it delivers polished gameplay with helpful real‑time guidance from the friendly “dot” error handler.
 
-##✨ Key Features
+---
 
-Familiar Wordle GameplayGuess a 5‑letter word in six tries with color‑coded feedback.
+## ✨ Key Features
 
-Clean, Modern UIChatGPT‑inspired styling, smooth animations, and intuitive layout.
+- **Familiar Wordle Gameplay**\
+  Guess a 5‑letter word in six tries with color‑coded feedback.
 
-“Dot” Error HandlerOur little assistant guides you through every guess, explains errors, and offers tips.
+- **Clean, Modern UI**\
+  ChatGPT‑inspired styling, smooth animations, and intuitive layout.
 
-Built with React ComponentsCombines hand‑crafted and ready‑made components for rapid development and consistency.
+- **“Dot” Error Handler**\
+  Our little assistant guides you through every guess, explains errors, and offers tips.
 
-High‑Score LeaderboardPersist wins in MongoDB and view top players—filter by word length and repetition settings.
+- **Built with React Components**\
+  Combines hand‑crafted and ready‑made components for rapid development and consistency.
 
-##🛠️ Tech Stack
+- **High‑Score Leaderboard**\
+  Persist wins in MongoDB and view top players—filter by word length and repetition settings.
 
-Frontend: React · TypeScript · Vite · TailwindCSS
+---
 
-Backend: Node.js · Express · MongoDB · Pug (SSR)
+## 🛠️ Tech Stack
 
-Testing: Vitest · Testing Library · MSW
+- **Frontend:** React · TypeScript · Vite · TailwindCSS
+- **Backend:** Node.js · Express · MongoDB · Pug (SSR)
+- **Testing:** Vitest · Testing Library · MSW
 
-##🚀 Quick Start
+---
 
-Clone & Install
+## 🚀 Quick Start
 
-git clone <repo-url> && cd wordle-fullstack
-npm install
+1. **Clone & Install**
+   ```bash
+   git clone <repo-url> && cd wordle-fullstack
+   npm install
+   ```
+2. **Run Dev Servers**
+   ```bash
+   npm run dev:backend   # Express on :3000  
+   npm run dev:frontend  # Vite on :5173
+   ```
+3. **Play!**\
+   Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-Run Dev Servers
+---
 
-npm run dev:backend   # Express on :5080  
-npm run dev:frontend  # Vite on :5173
+## 🎮 How to Play
 
-Play!Open http://localhost:5173 in your browser.
+1. Enter a 5‑letter guess and press Enter.
+2. Check the colors:
+   - 🟩 Right letter & spot
+   - 🟨 Right letter, wrong spot
+   - ⬜ Not in the word
+3. Ask “dot” for hints or troubleshooting anytime—just click the dot icon!
 
-##🎮 How to Play
-The cute dot will give you all feedback you need.
+---
 
-##📜 License & Author
+## 📜 License & Author
 
-License: ISC
-Author: KikoDevv
+- **License:** ISC
+- **Author:** KikoDevv
 
-Enjoy and may the dot be ever in your favor! 🎉
+Enjoy—and may the dot be ever in your favor! 🎉
+
