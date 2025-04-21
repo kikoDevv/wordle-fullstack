@@ -1,8 +1,8 @@
-🚀 WordleGPT: ChatGPT‑Style Wordle
+#🚀 WordleGPT: ChatGPT‑Style Wordle
 
 A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. Built from a mix of custom and prebuilt React components, it delivers polished gameplay with helpful real‑time guidance from the friendly “dot” error handler.
 
-✨ Key Features
+##✨ Key Features
 
 Familiar Wordle GameplayGuess a 5‑letter word in six tries with color‑coded feedback.
 
@@ -14,7 +14,7 @@ Built with React ComponentsCombines hand‑crafted and ready‑made components f
 
 High‑Score LeaderboardPersist wins in MongoDB and view top players—filter by word length and repetition settings.
 
-🛠️ Tech Stack
+##🛠️ Tech Stack
 
 Frontend: React · TypeScript · Vite · TailwindCSS
 
@@ -22,7 +22,7 @@ Backend: Node.js · Express · MongoDB · Pug (SSR)
 
 Testing: Vitest · Testing Library · MSW
 
-🚀 Quick Start
+##🚀 Quick Start
 
 Clone & Install
 
@@ -36,10 +36,10 @@ npm run dev:frontend  # Vite on :5173
 
 Play!Open http://localhost:5173 in your browser.
 
-🎮 How to Play
+##🎮 How to Play
 The cute dot will give you all feedback you need.
 
-📜 License & Author
+##📜 License & Author
 
 License: ISC
 Author: KikoDevv
