@@ -1,89 +1,47 @@
-# A very Fullstack chatGPT UI inspired wordle game.
+🚀 WordleGPT: ChatGPT‑Style Wordle
 
-A full-featured Wordle game implementation with React frontend and Express
-backend. A combination of custom-built and pre-existing React components, redesigned and repurposed to fulfill the project’s requirements.
- This application allows users to play the classic word-guessing game
-with various customization options and high score tracking.
+A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. Built from a mix of custom and prebuilt React components, it delivers polished gameplay with helpful real‑time guidance from the friendly “dot” error handler.
 
-## Features
+✨ Key Features
 
-- **Core Wordle Gameplay**: Guess the secret word
-- **Real-time Feedback**: Color-coded feedback for correct letters and positions
-- **Customizable Word Length**: Play with words from 3 to 8 letters
-- **Letter Repetition Toggle**: Choose to play with or without repeated letters
-- **Cheat Mode**: Optional mode that reveals the target word for practice
-- **Score Tracking**: High scores saved to MongoDB database
-- **Leaderboard**: Server-side rendered view of top scores
-- **Score Filtering**: Filter scores by word length and letter repetition
-  settings
+Familiar Wordle GameplayGuess a 5‑letter word in six tries with color‑coded feedback.
 
-## Technology Stack
+Clean, Modern UIChatGPT‑inspired styling, smooth animations, and intuitive layout.
 
-- **Frontend**: React, TypeScript, Vite, TailwindCSS
-- **Backend**: Node.js, Express, MongoDB
-- **Testing**: Vitest, Testing Library, MSW (Mock Service Worker)
-- **View Engine**: Pug for server-side rendered pages
+“Dot” Error HandlerOur little assistant guides you through every guess, explains errors, and offers tips.
 
-## Getting Started
+Built with React ComponentsCombines hand‑crafted and ready‑made components for rapid development and consistency.
 
-### Prerequisites
+High‑Score LeaderboardPersist wins in MongoDB and view top players—filter by word length and repetition settings.
 
-- Node.js v18 or newer
-- MongoDB running locally or remote connection
+🛠️ Tech Stack
 
-### Installation
+Frontend: React · TypeScript · Vite · TailwindCSS
 
-1. Clone the repository:
+Backend: Node.js · Express · MongoDB · Pug (SSR)
 
-```bash
-git clone <repository-url>
-cd wordle-fullstack
-```
+Testing: Vitest · Testing Library · MSW
 
-2. Install dependencies:
+🚀 Quick Start
 
-```bash
+Clone & Install
+
+git clone <repo-url> && cd wordle-fullstack
 npm install
-```
 
-This will automatically install dependencies for both frontend and backend.
+Run Dev Servers
 
-### Running the Application in dev Mode
+npm run dev:backend   # Express on :5080  
+npm run dev:frontend  # Vite on :5173
 
-1. Start the backend server:
+Play!Open http://localhost:5173 in your browser.
 
-```bash
-npm run dev:backend
-```
+🎮 How to Play
+The cute dot will give you all feedback you need.
 
-2. In a separate terminal, start the frontend dev server:
+📜 License & Author
 
-```bash
-npm run dev:frontend
-```
+License: ISC
+Author: KikoDevv
 
-The frontend will be available at http://localhost:5173 with full hot-reloading
-capabilities.
-
-## Testing
-Run the test suite with:
-
-```bash
-npm test
-```
-
-This runs integration tests that verify:
-
-- API functionality
-- Game flow and mechanics
-- Score submission
-- Input validation
-
-## How to Play
-There is cute looking dot that will tell you everyting, no worry.
-
-## License
-ISC
-
-## Author
-KikoDevv
+Enjoy and may the dot be ever in your favor! 🎉
