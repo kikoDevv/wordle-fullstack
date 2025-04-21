@@ -19,14 +19,11 @@ app.use(
 	})
 );
 
-// Set up view engine
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
-if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname, "public/app")));
-}
+app.use(express.static(path.join(__dirname, "public/app")));
 
 const formatTime = (ms) => {
 	const seconds = Math.floor(ms / 1000);
@@ -37,7 +34,7 @@ const formatTime = (ms) => {
 
 const formatDate = (dateString) => {
 	const date = new Date(dateString);
-	return date.toLocaleDateString(); // Only show year/month/day
+	return date.toLocaleDateString();
 };
 
 app.locals.formatTime = formatTime;
@@ -57,7 +54,7 @@ const generateGameId = () => Math.random().toString(36).substring(2, 15);
 // Register score routes
 app.use("/api/scores", scoreRoutes);
 
-// SSR Routes
+// SSR Routes - explicit path, no pattern matching
 app.get("/scores", async (req, res) => {
 	try {
 		const query = {};
@@ -247,13 +244,14 @@ app.get("/health", (req, res) => {
 	res.status(200).send("OK");
 });
 
-if (process.env.NODE_ENV === "production") {
-	app.get("*", (req, res) => {
-		if (!req.path.startsWith("/api/") && req.path !== "/scores") {
-			res.sendFile(path.join(__dirname, "public/app/index.html"));
-		}
-	});
-}
+// Fix the catch-all route to avoid path-to-regexp issues in production
+// This must be the last route
+app.use((req, res, next) => {
+	if (req.path.startsWith("/api/") || req.path === "/scores") {
+		return next();
+	}
+	res.sendFile(path.join(__dirname, "public/app/index.html"));
+});
 
 app.listen(PORT, "0.0.0.0", () => {
 	console.log(`Server running on port ${PORT}`);

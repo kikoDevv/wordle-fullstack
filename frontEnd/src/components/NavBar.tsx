@@ -240,7 +240,7 @@ export default function NavBar() {
 				{/*-------Footer section-----------*/}
 				<div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700 mt-auto">
 					<p className="text-sm text-gray-400 text-center">
-						© 2025 wordle: KikoDevv
+					Version 1.0 • KikoDevv
 					</p>
 				</div>
 			</div>
