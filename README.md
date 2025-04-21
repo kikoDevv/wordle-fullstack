@@ -50,7 +50,7 @@ A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. 
 
 ## 🎮 How to Play
 
-https://github.com/user-attachments/assets/32cb8983-9fd9-4df2-890c-4421a5e9d346
+https://github.com/user-attachments/assets/41224e2d-ce19-4dc7-bcd2-1cbf263f3074
 
 ---
 
