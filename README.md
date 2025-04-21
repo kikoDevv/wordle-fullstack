@@ -54,6 +54,10 @@ A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. 
 
 
 
+https://github.com/user-attachments/assets/712409db-7943-4c9a-8475-ff49593a0d4f
+
+
+
 ---
 
 ## 📜 License & Author
