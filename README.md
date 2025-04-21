@@ -1,4 +1,4 @@
-## 🚀 WordleGPT: ChatGPT‑Style Wordle
+## 🚀 WordleGPT
 
 A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. Built from a mix of custom and prebuilt React components, it delivers polished gameplay with helpful real‑time guidance from the friendly “dot” error handler.
 
