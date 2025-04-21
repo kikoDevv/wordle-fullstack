@@ -40,7 +40,7 @@ A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. 
    ```
 2. **Run Dev Servers**
    ```bash
-   npm run dev:backend   # Express on :3000  
+   npm run dev:backend   # Express on :5080  
    npm run dev:frontend  # Vite on :5173
    ```
 3. **Play!**\
@@ -50,12 +50,7 @@ A classic Wordle clone with a sleek, modern UI inspired by the ChatGPT website. 
 
 ## 🎮 How to Play
 
-1. Enter a 5‑letter guess and press Enter.
-2. Check the colors:
-   - 🟩 Right letter & spot
-   - 🟨 Right letter, wrong spot
-   - ⬜ Not in the word
-3. Ask “dot” for hints or troubleshooting anytime—just click the dot icon!
+https://github.com/user-attachments/assets/32cb8983-9fd9-4df2-890c-4421a5e9d346
 
 ---
 
