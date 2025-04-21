@@ -9,7 +9,8 @@
 		"postinstall": "npm run install:backend && npm run install:frontend",
 		"build:frontend": "cd frontEnd && npm run build",
 		"start:backend": "cd backEnd && node server.js",
-		"start": "npm run build:frontend && npm run start:backend"
+		"start": "npm run build:frontend && npm run start:backend",
+		"test": "cd frontEnd && npm test"
 	},
 	"engines": {
 		"node": ">=18.0.0"
