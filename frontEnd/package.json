@@ -6,7 +6,8 @@
 	"proxy": "http://localhost:5080/",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"build": "vite build --emptyOutDir",
+		"type-check": "tsc -b --noEmit",
 		"lint": "eslint .",
 		"preview": "vite preview",
 		"test": "vitest run",
